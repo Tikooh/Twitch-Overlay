@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  frontend:
+    build: ./Twitch-overlay
+    ports:
+      -"3000"
+    dpeends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000"
