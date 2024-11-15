@@ -1,11 +1,13 @@
 from flask import Flask, jsonify, request
-import requests
 import os
 from flask_cors import CORS
 from dotenv import load_dotenv
 from twitchio.ext import commands
-import asyncio
 import threading
+import json
+
+import logging
+# logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 CORS(app)
@@ -17,7 +19,7 @@ CHANNEL_NAME = 'george_f0'
 AUTH_TOKEN = os.getenv('AUTH_TOKEN')
 
 bot = commands.Bot(
-    token=(f"{os.getenv('AUTH_TOKEN')}"),
+    token=(f"oauth:{os.getenv('AUTH_TOKEN')}"),
     prefix='!',
     initial_channels=[CHANNEL_NAME]
 )
@@ -26,31 +28,44 @@ message_list = []
 
 @bot.event
 async def event_ready():
-    print(f'Logged in as | {bot.nick}')
+    try:
+        print(f'Logged in as | {bot.nick}', flush=True)
+    except Exception as e:
+        print(f'Error in event_ready: {e}', flush=True)
 
 @bot.event
 async def event_message(message):
-    print(message)
-    message_list.append(message)
-    
+    await bot.process_commands(message)
 
-@app.route("/getAuth", methods=['GET'])
-def get_auth_tokens():
-    return jsonify({'auth_token', AUTH_TOKEN})
+    name = message.author.name
+    content = message.content
+
+    message = {
+        "name": name,
+        "content": content
+    }
+    
+    message_list.append(message)
+
+    message_list = message_list[-5:]
 
 @app.route("/getChat", methods=['GET'])
 def get_chat_messages():
-    return jsonify({'messages', message_list})
+    return json.dump(message_list)
 
 def run_bot():
     bot.run()
+def run_app():
+    app.run(debug=True, use_reloader=False)
 
 if __name__ == '__main__':
-
+    run_bot()
     bot_thread = threading.Thread(target=run_bot)
     bot_thread.start()
     
 
-    app.run(debug=True)
+    app_thread = threading.Thread(target=run_app)
+    app_thread.start()
+
 
 
