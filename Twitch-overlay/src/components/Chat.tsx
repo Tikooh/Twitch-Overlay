@@ -1,32 +1,28 @@
 import { useEffect, useState } from "react"
-import axios from 'axios'
 
 type message = {
     name: string,
     content: string
 }
 
-
 const Chat = () => {
     // const [auth_token, set_auth_token] = use_auth_token_context()
     const [messages, setMessages] = useState<message[]>([])
-
-
-    const fetchMessages = async () => {
-        const response = await axios.get('http://localhost:5000/getChat')
-
-        console.log(response.data.messages)
-        
-        setMessages(response.data.messages)
-    }
+    const [socket, setSocket] = useState<WebSocket>()
 
     useEffect(() => {
-        const intervalId = setInterval(() => {
-            fetchMessages()
-        }, 5000)
+        const ws = new WebSocket('ws://localhost:5000')
+        setSocket(ws)
 
-        return () => clearInterval(intervalId)
-    }, [])
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data)
+            const { event: eventName, data: messageData } = data
+
+            if (eventName === 'getChat') {
+                setMessages(messageData)
+            }
+        }
+    }) 
 
     const content = (
         <>

@@ -1,17 +1,10 @@
-from flask import Flask, jsonify, request
 import os
-from flask_cors import CORS
+import websockets
 from dotenv import load_dotenv
-from twitchio.ext import commands
-import threading
-import asyncio
+from twitchio.ext import commands, eventsub
 import json
+import asyncio
 
-import logging
-# logging.basicConfig(level=logging.DEBUG)
-
-app = Flask(__name__)
-CORS(app)
 
 load_dotenv()
 
@@ -21,17 +14,37 @@ AUTH_TOKEN = os.getenv('AUTH_TOKEN')
 
 message_list = []
 
+clients = set()
+
+async def handle_websocket(websocket):
+
+    clients.add(websocket)
+
+    try:
+        async for message in websocket:
+            pass
+    finally:
+        clients.remove(websocket)
+
+async def send_to_clients(event, data):
+    if clients:
+        message = {
+            'event': event,  # Include event name
+            'data': data     # Include data associated with the event
+        }
+        await asyncio.gather(*[client.send(json.dumps(message)) for client in clients])
+
 
 class Bot(commands.Bot):
     def __init__(self):
         super().__init__(token=(f"oauth:{os.getenv('AUTH_TOKEN')}"), prefix="!", initial_channels=[CHANNEL_NAME])
 
-    async def event_message(self, message):
+    async def event_message(self, data):
 
         global message_list
 
-        name = message.author.name
-        content = message.content
+        name = data.author.name
+        content = data.content
 
         message = {
             "name": name,
@@ -39,32 +52,26 @@ class Bot(commands.Bot):
         }
         
         message_list.append(message)
+        print(message_list)
+        await send_to_clients('getChat', message_list[-10:])
 
-        message_list = message_list[-5:]
+        # await self.handle_commands(message)
     
     async def event_ready(self):
         try:
-            print(f'Logged in as | {bot.nick}', flush=True)
+            print(f'Logged in as | {self.nick}', flush=True)
         except Exception as e:
             print(f'Error in event_ready: {e}', flush=True)
+    
+    async def close(self):
+        await super().close()
 
-
-
-@app.route("/getChat", methods=['GET'])
-def get_chat_messages():
-    return jsonify(message_list)
-
-def run_app():
-    app.run(port=5000)
+async def main():
+    bot = Bot()
+    server = await websockets.serve(handle_websocket, "localhost", 5000)
+    await asyncio.gather(server.wait_closed(), bot.start()) 
 
 if __name__ == '__main__':
-
-    bot = Bot()
-    flask_thread = threading.Thread(target=run_app)
-    flask_thread.start()
-
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(bot.run())
-
+    asyncio.run(main())
 
 
