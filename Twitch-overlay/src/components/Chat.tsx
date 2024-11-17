@@ -46,6 +46,12 @@ const Chat = () => {
         }
     }, []) 
 
+    useEffect(() => {
+        if (messages.length >= 10) {
+            setMessages(prevMessages => prevMessages.slice(1))
+        }
+    }, [messages])
+
     const content = (
         <>
             <div>
