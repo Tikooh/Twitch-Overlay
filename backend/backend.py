@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from twitchio.ext import commands, eventsub
 import json
 import asyncio
+import time
 
 
 load_dotenv()
@@ -11,8 +12,6 @@ load_dotenv()
 CLIENT_ID = os.getenv('CLIENT_ID')
 CHANNEL_NAME = 'george_f0'
 AUTH_TOKEN = os.getenv('AUTH_TOKEN')
-
-message_list = []
 
 clients = set()
 
@@ -32,7 +31,7 @@ async def send_to_clients(event, data):
             'event': event,  # Include event name
             'data': data     # Include data associated with the event
         }
-        await asyncio.gather(*[client.send(json.dumps(message)) for client in clients])
+        await asyncio.gather(*[client.send(json.dumps(message)) for client in clients]) #star is important dont forget the star
 
 
 class Bot(commands.Bot):
@@ -41,30 +40,24 @@ class Bot(commands.Bot):
 
     async def event_message(self, data):
 
-        global message_list
-
         name = data.author.name
         content = data.content
 
         message = {
             "name": name,
-            "content": content
+            "content": content,
+            "expiry": 15000
         }
         
-        message_list.append(message)
-        print(message_list)
-        await send_to_clients('getChat', message_list[-10:])
+        print(message)
+        await send_to_clients('getChat', message)
 
-        # await self.handle_commands(message)
     
     async def event_ready(self):
         try:
             print(f'Logged in as | {self.nick}', flush=True)
         except Exception as e:
             print(f'Error in event_ready: {e}', flush=True)
-    
-    async def close(self):
-        await super().close()
 
 async def main():
     bot = Bot()

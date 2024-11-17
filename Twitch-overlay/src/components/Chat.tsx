@@ -2,7 +2,20 @@ import { useEffect, useState } from "react"
 
 type message = {
     name: string,
-    content: string
+    content: string,
+    expiry: number
+    id: number
+}
+
+type propsType = {
+    name: string,
+    content: string,
+    expiry: number
+}
+
+type socketEvent = {
+    event: string
+    data: propsType
 }
 
 const Chat = () => {
@@ -15,14 +28,23 @@ const Chat = () => {
         setSocket(ws)
 
         ws.onmessage = (event) => {
-            const data = JSON.parse(event.data)
-            const { event: eventName, data: messageData } = data
+            const received_message: socketEvent = JSON.parse(event.data)
 
-            if (eventName === 'getChat') {
-                setMessages(messageData)
+            if (received_message.event === 'getChat') {
+                const msg: message = {
+                    ...received_message.data,
+                    id: Date.now()
+                }
+
+                console.log(msg)
+                setMessages(prevMessages => [...prevMessages, msg])
+
+                setTimeout(() => {
+                    setMessages(prevMessages => prevMessages.filter(item => item.id !== msg.id))
+                }, (received_message.data.expiry))
             }
         }
-    }) 
+    }, []) 
 
     const content = (
         <>
