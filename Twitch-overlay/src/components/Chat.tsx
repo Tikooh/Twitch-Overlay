@@ -33,6 +33,8 @@ const Chat = () => {
             const received_message: socketEvent = JSON.parse(event.data)
 
             if (received_message.event === 'getChat') {
+
+                console.log("Message Received")
                 const msg: message = {
                     ...received_message.data,
                     id: Date.now()
@@ -57,7 +59,7 @@ const Chat = () => {
 
     const content = (
         <>
-            <div>
+            <div className="div__chat_window">
                 <p>Chat:</p>
                 {messages.map(message => {
                     return (

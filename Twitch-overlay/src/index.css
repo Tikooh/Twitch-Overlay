@@ -4,11 +4,22 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  color: white;
   background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+/* 
+.div__chat_window {
+  background-image: url('/home/george/Twitch-Overlay/Twitch-overlay/src/images/Chat Window-export.png');
+  width: 525px;
+  height: 650px;
+} */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
 }
