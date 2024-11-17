@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { use_ws_context } from "../context/wsContext"
 
 type message = {
     name: string,
@@ -23,8 +24,9 @@ const Chat = () => {
     const [messages, setMessages] = useState<message[]>([])
     const [socket, setSocket] = useState<WebSocket>()
 
+    const ws = use_ws_context()
+
     useEffect(() => {
-        const ws = new WebSocket('ws://localhost:5000')
         setSocket(ws)
 
         ws.onmessage = (event) => {
@@ -36,7 +38,6 @@ const Chat = () => {
                     id: Date.now()
                 }
 
-                console.log(msg)
                 setMessages(prevMessages => [...prevMessages, msg])
 
                 setTimeout(() => {
@@ -46,6 +47,8 @@ const Chat = () => {
         }
     }, []) 
 
+
+    // MESSAGE LIMIT
     useEffect(() => {
         if (messages.length >= 10) {
             setMessages(prevMessages => prevMessages.slice(1))
