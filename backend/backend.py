@@ -9,9 +9,10 @@ import asyncio
 load_dotenv()
 
 CLIENT_ID = os.getenv('CLIENT_ID')
-CHANNEL_NAME = 'george_f0'
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+CHANNEL_NAME = 'Brawlhalla'
 AUTH_TOKEN = os.getenv('AUTH_TOKEN')
-SECRET = ''
+SECRET = os.getenv('SECRET')
 
 clients = set()
 
@@ -31,31 +32,31 @@ async def send_to_clients(event, data):
             'event': event,  # Include event name
             'data': data     # Include data associated with the event
         }
+        print(clients)
         await asyncio.gather(*[client.send(json.dumps(message)) for client in clients]) #star is important dont forget the star
+
+
+esbot = commands.Bot.from_client_credentials(client_id=CLIENT_ID,
+                                             client_secret=SECRET)
+
+esclient = eventsub.EventSubClient(esbot,
+                                   webhook_secret=SECRET,
+                                   callback_route='https://localhost:5000')
 
 
 class Bot(commands.Bot):
     def __init__(self):
         super().__init__(token=(f"oauth:{os.getenv('AUTH_TOKEN')}"), prefix="!", initial_channels=[CHANNEL_NAME])
 
-        self.eventsub_client = eventsub.EventSubClient(
-            client = self,
-            webhook_secret = SECRET,
-            callback_route='',
-            token=(f"oauth:{os.getenv('AUTH_TOKEN')}")
-        )
+    async def __ainit__(self):
+    
+        try:
+            await esclient.subscribe_channel_follows_v2(broadcaster='75346877')
 
-        user_id = '213205254'
+            self.loop.create_task(esclient.listen(port=5000))
 
-
-    async def subscribe_to_events(self):
-        await self.eventsub_client.subscribe_websocket(
-            event_type = "channel.follow",
-            condition={"broadcaster_user_id": self.user_id}
-        )
-
-    async def on_follow(self, event: eventsub.ChannelFollowData):
-        await send_to_clients('follow', {event.user_name})
+        except:
+            pass
 
     async def event_message(self, data):
 
@@ -76,17 +77,18 @@ class Bot(commands.Bot):
         try:
             print(f'Logged in as | {self.nick}', flush=True)
 
-            await self.eventsub_client.listen_websocket()
-
-            await self.subscribe_to_events(self.user_id)
-
         except Exception as e:
             print(f'Error in event_ready: {e}', flush=True)
+
+@esbot.event()
+async def event_eventsub_notification_followV2(payload: eventsub.ChannelFollowData):
+    print("received event")
+    await send_to_clients('follow', payload.data.user.name)
 
 async def main():
     bot = Bot()
     server = await websockets.serve(handle_websocket, "localhost", 5000)
-    await asyncio.gather(server.wait_closed(), bot.start()) 
+    await asyncio.gather(server.wait_closed(), bot.start(), bot.__ainit__()) 
 
 if __name__ == '__main__':
     asyncio.run(main())

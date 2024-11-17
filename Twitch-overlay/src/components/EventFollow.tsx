@@ -16,13 +16,14 @@ const EventFollow = () => {
         ws.onmessage = (event) => {
             const received_message: socketEvent = JSON.parse(event.data)
 
-            console.log(user)
+            console.log(received_message)
 
             if (received_message.event === 'follow') {
+                console.log(user)
                 setUser(received_message.data)
             }
         }
-    }, []) 
+    }, [ws]) 
 
 
     const content = (

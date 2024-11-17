@@ -22,16 +22,15 @@ type socketEvent = {
 const Chat = () => {
     // const [auth_token, set_auth_token] = use_auth_token_context()
     const [messages, setMessages] = useState<message[]>([])
-    const [socket, setSocket] = useState<WebSocket>()
 
     const ws = use_ws_context()
 
     useEffect(() => {
-        setSocket(ws)
 
         ws.onmessage = (event) => {
             const received_message: socketEvent = JSON.parse(event.data)
 
+            // console.log(received_message)
             if (received_message.event === 'getChat') {
 
                 console.log("Message Received")
@@ -47,7 +46,7 @@ const Chat = () => {
                 }, (received_message.data.expiry))
             }
         }
-    }, []) 
+    }, [ws]) 
 
 
     // MESSAGE LIMIT
@@ -63,7 +62,7 @@ const Chat = () => {
                 <p>Chat:</p>
                 {messages.map(message => {
                     return (
-                        <p>{message.name}: {message.content}</p>
+                        <p key={message.id}>{message.name}: {message.content}</p>
                     )
                 })}
             </div>
