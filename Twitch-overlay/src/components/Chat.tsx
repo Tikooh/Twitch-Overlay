@@ -15,7 +15,6 @@ type propsType = {
 }
 
 const Chat = () => {
-    // const [auth_token, set_auth_token] = use_auth_token_context()
     const [messages, setMessages] = useState<message[]>([])
 
     const {addListener, removeListener} = OnMessage()
@@ -47,7 +46,7 @@ const Chat = () => {
         return () => {
             removeListener(handleMessage)
         }
-    }, [])
+    }, [addListener, removeListener])
 
     // MESSAGE LIMIT
     useEffect(() => {

@@ -51,7 +51,7 @@ class Bot(commands.Bot):
     async def __ainit__(self):
     
         try:
-            await esclient.subscribe_channel_follows_v2(broadcaster='75346877')
+            await esclient.subscribe_channel_follows_v2(broadcaster='43683025')
 
             self.loop.create_task(esclient.listen(port=5000))
 

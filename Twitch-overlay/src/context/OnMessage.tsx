@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { message } from "../components/Chat";
 import { use_ws_context } from "./wsContext";
 
@@ -19,7 +20,7 @@ const OnMessage = () => {
 
     const ws = use_ws_context()
     const listeners: Set<Listener> = new Set()
-    
+
     ws.onmessage = (event) => {
         const received_message = JSON.parse(event.data)
     

@@ -23,7 +23,7 @@ const EventFollow = () => {
         return () => {
             removeListener(handleMessage)
         }
-    },[])
+    },[addListener, removeListener])
 
 
     const content = (
