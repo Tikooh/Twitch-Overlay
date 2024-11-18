@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
-import { use_ws_context } from "../context/wsContext"
+import OnMessage, { messageType } from "../context/OnMessage"
 
-type message = {
+export type message = {
     name: string,
     content: string,
     expiry: number
@@ -14,40 +14,40 @@ type propsType = {
     expiry: number
 }
 
-type socketEvent = {
-    event: string
-    data: propsType
-}
-
 const Chat = () => {
     // const [auth_token, set_auth_token] = use_auth_token_context()
     const [messages, setMessages] = useState<message[]>([])
 
-    const ws = use_ws_context()
+    const {addListener, removeListener} = OnMessage()
 
-    useEffect(() => {
+    const handleMessage = (event: messageType) => {
+        const received_message: messageType = event
 
-        ws.onmessage = (event) => {
-            const received_message: socketEvent = JSON.parse(event.data)
+        if (received_message.event === 'getChat') {
 
-            // console.log(received_message)
-            if (received_message.event === 'getChat') {
-
-                console.log("Message Received")
+            console.log("Message Received")
+            if ('content' in received_message.data && 'expiry' in received_message.data) {
+                    
                 const msg: message = {
                     ...received_message.data,
                     id: Date.now()
                 }
-
+    
                 setMessages(prevMessages => [...prevMessages, msg])
-
+    
                 setTimeout(() => {
                     setMessages(prevMessages => prevMessages.filter(item => item.id !== msg.id))
                 }, (received_message.data.expiry))
             }
-        }
-    }, [ws]) 
+    }}
 
+    useEffect(() => {
+        addListener(handleMessage)
+
+        return () => {
+            removeListener(handleMessage)
+        }
+    }, [])
 
     // MESSAGE LIMIT
     useEffect(() => {

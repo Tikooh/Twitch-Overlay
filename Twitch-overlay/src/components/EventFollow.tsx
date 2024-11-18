@@ -1,29 +1,29 @@
 import { useEffect, useState } from "react"
-import { use_ws_context } from "../context/wsContext"
-
-type socketEvent = {
-    event: string
-    data: string
-}
+import OnMessage, { messageType } from "../context/OnMessage"
 
 const EventFollow = () => {
 
     const [user, setUser] = useState('')
-    const ws = use_ws_context()
+    const { addListener, removeListener}  = OnMessage()
+
+    const handleMessage = (event: messageType) => {
+        const received_message: messageType = event
+
+        console.log(received_message)
+
+        if (received_message.event === 'follow') {
+            console.log(user)
+            setUser(received_message.data.name)
+        }
+    }
 
     useEffect(() => {
+        addListener(handleMessage)
 
-        ws.onmessage = (event) => {
-            const received_message: socketEvent = JSON.parse(event.data)
-
-            console.log(received_message)
-
-            if (received_message.event === 'follow') {
-                console.log(user)
-                setUser(received_message.data)
-            }
+        return () => {
+            removeListener(handleMessage)
         }
-    }, [ws]) 
+    },[])
 
 
     const content = (

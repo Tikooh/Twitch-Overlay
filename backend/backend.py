@@ -10,7 +10,7 @@ load_dotenv()
 
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-CHANNEL_NAME = 'Brawlhalla'
+CHANNEL_NAME = 'ohnePixel'
 AUTH_TOKEN = os.getenv('AUTH_TOKEN')
 SECRET = os.getenv('SECRET')
 
