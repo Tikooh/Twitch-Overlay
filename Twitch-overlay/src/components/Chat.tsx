@@ -46,7 +46,7 @@ const Chat = () => {
         return () => {
             removeListener(handleMessage)
         }
-    }, [addListener, removeListener])
+    }, [])
 
     // MESSAGE LIMIT
     useEffect(() => {

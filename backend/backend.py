@@ -4,13 +4,32 @@ from dotenv import load_dotenv
 from twitchio.ext import commands, eventsub
 import json
 import asyncio
+import logging
 
+# logging.basicConfig(level=logging.DEBUG)
+
+
+# FOR EVENTS CONFIGURE NGINX AT /etc/nginx/sites-available/default FOR REVERSE PROXY
+
+# server {
+#     listen 80;
+#     server_name localhost;
+
+#     location / {
+#         proxy_pass http://localhost:5000;  # Your backend application
+#         proxy_http_version 1.1;
+#         proxy_set_header Upgrade $http_upgrade;
+#         proxy_set_header Connection 'upgrade';
+#         proxy_set_header Host $host;
+#         proxy_cache_bypass $http_upgrade;
+#     }
+# }
 
 load_dotenv()
 
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-CHANNEL_NAME = 'ohnePixel'
+CHANNEL_NAME = 'DougDoug'
 AUTH_TOKEN = os.getenv('AUTH_TOKEN')
 SECRET = os.getenv('SECRET')
 
@@ -32,7 +51,6 @@ async def send_to_clients(event, data):
             'event': event,  # Include event name
             'data': data     # Include data associated with the event
         }
-        print(clients)
         await asyncio.gather(*[client.send(json.dumps(message)) for client in clients]) #star is important dont forget the star
 
 
@@ -49,10 +67,8 @@ class Bot(commands.Bot):
         super().__init__(token=(f"oauth:{os.getenv('AUTH_TOKEN')}"), prefix="!", initial_channels=[CHANNEL_NAME])
 
     async def __ainit__(self):
-    
         try:
-            await esclient.subscribe_channel_follows_v2(broadcaster='43683025')
-
+            await esclient.subscribe_channel_follows_v2(broadcaster='31507411')
             self.loop.create_task(esclient.listen(port=5000))
 
         except:
