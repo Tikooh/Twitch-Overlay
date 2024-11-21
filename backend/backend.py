@@ -5,8 +5,9 @@ from twitchio.ext import commands, eventsub
 import json
 import asyncio
 import logging
+import ssl
 
-# logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 
 
 # FOR EVENTS CONFIGURE NGINX AT /etc/nginx/sites-available/default FOR REVERSE PROXY
@@ -32,6 +33,9 @@ CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 CHANNEL_NAME = 'DougDoug'
 AUTH_TOKEN = os.getenv('AUTH_TOKEN')
 SECRET = os.getenv('SECRET')
+
+ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+ssl_context.load_cert_chain(certfile="/etc/ssl/localhost.crt", keyfile="/etc/ssl/localhost.key")  # Paths to your SSL cert and key
 
 clients = set()
 
@@ -68,7 +72,12 @@ class Bot(commands.Bot):
 
     async def __ainit__(self):
         try:
-            await esclient.subscribe_channel_follows_v2(broadcaster='31507411')
+            print("initilizing event bot")
+            try:
+                response = await esclient.subscribe_channel_follows_v2(broadcaster='31507411', moderator="213205254")
+                print(f'Response: {response}')
+            except Exception as e:
+                print(f"Error occurred during subscription: {e}")
             self.loop.create_task(esclient.listen(port=5000))
 
         except:
@@ -85,7 +94,7 @@ class Bot(commands.Bot):
             "expiry": 15000
         }
         
-        print(message)
+        # print(message)
         await send_to_clients('getChat', message)
 
     
@@ -103,8 +112,8 @@ async def event_eventsub_notification_followV2(payload: eventsub.ChannelFollowDa
 
 async def main():
     bot = Bot()
-    server = await websockets.serve(handle_websocket, "localhost", 5000)
-    await asyncio.gather(server.wait_closed(), bot.start(), bot.__ainit__()) 
+    server = await websockets.serve(handle_websocket, "localhost", 5000, ssl=ssl_context)
+    await asyncio.gather(server.wait_closed(), bot.__ainit__()) 
 
 if __name__ == '__main__':
     asyncio.run(main())

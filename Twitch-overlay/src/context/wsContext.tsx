@@ -2,7 +2,7 @@ import { createContext, ReactElement, useContext } from "react"
 
 type WebSocketType = WebSocket
 
-const ws = new WebSocket('ws://localhost:5000')
+const ws = new WebSocket('wss://localhost:5000')
 
 const ws_context = createContext<WebSocketType>(ws)
 
