@@ -30,7 +30,7 @@ load_dotenv()
 
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-CHANNEL_NAME = 'DougDoug'
+CHANNEL_NAME = 'philza'
 AUTH_TOKEN = os.getenv('AUTH_TOKEN')
 SECRET = os.getenv('SECRET')
 
@@ -59,11 +59,11 @@ async def send_to_clients(event, data):
 
 
 esbot = commands.Bot.from_client_credentials(client_id=CLIENT_ID,
-                                             client_secret=SECRET)
+                                             client_secret=CLIENT_SECRET)
 
 esclient = eventsub.EventSubClient(esbot,
                                    webhook_secret=SECRET,
-                                   callback_route='https://localhost:5000')
+                                   callback_route='https://f0fe-94-174-171-208.ngrok-free.app/')
 
 
 class Bot(commands.Bot):
@@ -113,7 +113,7 @@ async def event_eventsub_notification_followV2(payload: eventsub.ChannelFollowDa
 async def main():
     bot = Bot()
     server = await websockets.serve(handle_websocket, "localhost", 5000, ssl=ssl_context)
-    await asyncio.gather(server.wait_closed(), bot.__ainit__()) 
+    await asyncio.gather(server.wait_closed(), bot.start(), bot.__ainit__()) 
 
 if __name__ == '__main__':
     asyncio.run(main())
