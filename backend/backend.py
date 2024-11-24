@@ -30,12 +30,9 @@ load_dotenv()
 
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-CHANNEL_NAME = 'philza'
+CHANNEL_NAME = 'george_f0'
 AUTH_TOKEN = os.getenv('AUTH_TOKEN')
 SECRET = os.getenv('SECRET')
-
-ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-ssl_context.load_cert_chain(certfile="/etc/ssl/localhost.crt", keyfile="/etc/ssl/localhost.key")  # Paths to your SSL cert and key
 
 clients = set()
 
@@ -63,22 +60,22 @@ esbot = commands.Bot.from_client_credentials(client_id=CLIENT_ID,
 
 esclient = eventsub.EventSubClient(esbot,
                                    webhook_secret=SECRET,
-                                   callback_route='https://f0fe-94-174-171-208.ngrok-free.app/')
+                                   callback_route='https://fgeorge.org/callback')
 
 
 class Bot(commands.Bot):
     def __init__(self):
-        super().__init__(token=(f"oauth:{os.getenv('AUTH_TOKEN')}"), prefix="!", initial_channels=[CHANNEL_NAME])
+        super().__init__(token=(f"oauth:{AUTH_TOKEN}"), prefix="!", initial_channels=[CHANNEL_NAME])
 
     async def __ainit__(self):
         try:
             print("initilizing event bot")
             try:
-                response = await esclient.subscribe_channel_follows_v2(broadcaster='31507411', moderator="213205254")
+                response = await esclient.subscribe_channel_follows_v2(broadcaster='213205254', moderator="213205254")
                 print(f'Response: {response}')
             except Exception as e:
                 print(f"Error occurred during subscription: {e}")
-            self.loop.create_task(esclient.listen(port=5000))
+            self.loop.create_task(esclient.listen(port=4000))
 
         except:
             pass
@@ -112,8 +109,9 @@ async def event_eventsub_notification_followV2(payload: eventsub.ChannelFollowDa
 
 async def main():
     bot = Bot()
-    server = await websockets.serve(handle_websocket, "localhost", 5000, ssl=ssl_context)
-    await asyncio.gather(server.wait_closed(), bot.start(), bot.__ainit__()) 
+    server = await websockets.serve(handle_websocket, "localhost", 5000)
+    eventsub_server = await websockets.serve(handle_websocket, "0.0.0.0", 4000)
+    await asyncio.gather(server.wait_closed(), eventsub_server.wait_closed(), bot.__ainit__(), bot.start()) 
 
 if __name__ == '__main__':
     asyncio.run(main())
