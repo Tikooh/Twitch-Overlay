@@ -163,3 +163,6 @@ sudo systemctl reload nginx
 ```
 
 Make sure to enable strict mode on cloudflare and disable cloudflare reverse proxy
+
+`sudo ufw allow 8443/tcp`
+`curl -X POST https://fgeorge.org:8443/eventsub/ -d '{"test": "data"}' -H "Content-Type: application/json"`
