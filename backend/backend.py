@@ -2,12 +2,13 @@ import os
 import websockets
 from dotenv import load_dotenv
 from twitchio.ext import commands, eventsub
+from aiohttp import web
 import json
 import asyncio
 import logging
 import ssl
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 
 # FOR EVENTS CONFIGURE NGINX AT /etc/nginx/sites-available/default FOR REVERSE PROXY
@@ -45,6 +46,20 @@ async def handle_websocket(websocket):
             pass
     finally:
         clients.remove(websocket)
+
+async def handle_http(request):
+    try:
+        data = await request.json()
+        print({data})
+        
+        if 'challenge' in data:
+            return web.Response(text=data['challenge'], status=200)
+        
+        return web.Response(text='OK', status=200)
+    except Exception:
+        print({Exception})
+        return web.Response(text="Error",status=500)
+
 
 async def send_to_clients(event, data):
     if clients:
@@ -110,8 +125,14 @@ async def event_eventsub_notification_followV2(payload: eventsub.ChannelFollowDa
 async def main():
     bot = Bot()
     server = await websockets.serve(handle_websocket, "localhost", 5000)
-    eventsub_server = await websockets.serve(handle_websocket, "0.0.0.0", 4000)
-    await asyncio.gather(server.wait_closed(), eventsub_server.wait_closed(), bot.__ainit__(), bot.start()) 
+
+    app = web.Application()
+    app.router.add_post('/eventsub/', handle_http)
+    http_runner = web.AppRunner(app)
+    await http_runner.setup()
+    http_server = web.TCPSite(http_runner, '0.0.0.0', 4000)  # Port for HTTP
+
+    await asyncio.gather(server.wait_closed(), http_server.start(), bot.__ainit__(), bot.start()) 
 
 if __name__ == '__main__':
     asyncio.run(main())

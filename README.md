@@ -69,9 +69,97 @@ ensure the firewall does not block
 
 eventsub sends a challenge to domain to ensure it is owned by the user. If this is not properly handled the connection is terminated
 
+```
 use curl -I https://www.fgeorge.org/eventsub/ to check if web host is available
+````
 
+```
 twitch event verify-subscription subscribe -F https://www.fgeorge.org/eventsub/ -s <YOUR WEBHOOK SECRET> for testing eventsub
+```
 
+curl -X POST http://fgeorge.org/eventsub/ -d '{"test": "data"}' -H "Content-Type: application/json"
+error code: 522
 
+server {
+    listen 80;
+    server_name fgeorge.org www.fgeorge.org;
 
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        proxy_pass http://localhost:4000;  # Your app running locally
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+```
+eventsub_server = await websockets.serve(handle_websocket, "0.0.0.0", 4000)
+
+ Cloudflare:
+SSL/TLS encryption
+Current encryption mode:
+
+Flexible
+
+	
+
+A
+fgeorge.org
+
+Proxied
+```
+
+EVENTSUB TAKES HTTP NOT WEBSOCKET IT DOES NOT COMMUNICATE WITH WEBSOCKETS
+
+`websocat wss://fgeorge.org/eventsub/ -t`
+
+`sudo certbot certonly --manual --preferred-challenges dns -d fgeorge.org -d www.fgeorge.org`
+
+`sudo netstat -tuln | grep 80`
+
+`sudo ufw status`
+
+`curl -X POST https://fgeorge.org/eventsub/ -d '{"test": "data"}' -H "Content-Type: application/json"`
+
+```
+server {
+    listen 443 ssl;
+    server_name fgeorge.org www.fgeorge.org;
+
+    ssl_certificate /etc/letsencrypt/live/fgeorge.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/fgeorge.org/privkey.pem;
+
+    # Proxy HTTP POST requests
+    location /eventsub/ {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Proxy WebSocket connections
+    location /ws/ {
+        proxy_pass http://localhost:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+```
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+Make sure to enable strict mode on cloudflare and disable cloudflare reverse proxy
