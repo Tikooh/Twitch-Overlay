@@ -2,6 +2,7 @@ import os
 import websockets
 from dotenv import load_dotenv
 from twitchio.ext import commands, eventsub
+import twitchio
 from aiohttp import web
 import json
 import asyncio
@@ -69,17 +70,13 @@ class Bot(commands.Bot):
         super().__init__(token=(f"oauth:{AUTH_TOKEN}"), prefix="!", initial_channels=[CHANNEL_NAME])
 
     async def __ainit__(self):
-        try:
-            print("initilizing event bot")
-            try:
-                response = await esclient.subscribe_channel_follows_v2(broadcaster='213205254', moderator="213205254")
-                print(f'Response: {response}')
-            except Exception as e:
-                print(f"Error occurred during subscription: {e}")
-            self.loop.create_task(esclient.listen(port=8443))
+        self.loop.create_task(esclient.listen(port=8443))
 
-        except:
-            pass
+        try:
+            await esclient.subscribe_channel_follows_v2(broadcaster=213205254, moderator=213205254)
+        except twitchio.HTTPException:
+            print("EXCEPTION HELP")
+
 
     async def event_message(self, data):
 
@@ -92,7 +89,7 @@ class Bot(commands.Bot):
             "expiry": 15000
         }
         
-        # print(message)
+        print(message)
         await send_to_clients('getChat', message)
 
     
@@ -104,9 +101,9 @@ class Bot(commands.Bot):
             print(f'Error in event_ready: {e}', flush=True)
 
 @esbot.event()
-async def event_eventsub_notification_followV2(payload: eventsub.ChannelFollowData):
-    print("received event")
-    await send_to_clients('follow', payload.data.user.name)
+async def event_eventsub_notification_followV2(payload: eventsub.ChannelFollowData) -> None:
+    print('Received event!')
+    await send_to_clients('follow', payload)
 
 async def main():
     bot = Bot()

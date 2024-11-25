@@ -295,3 +295,7 @@ twitch event verify-subscription subscribe -F https://fgeorge.org/eventsub/ -s 9
 ✔ Valid content-type header. Received type text/plain with charset utf-8
 ✔ Valid status code. Received status 200
 ```
+
+So first i generated a ssl cert with letsencrypt for fgeorge.org domain then I enabled port forwarding for 443 to my server. then I set up nginx to listne on port 443 and proxy all the request posts to my 8443 port with a secure ssl connection. Then I tested eventsub. I also had to set record A to point my domain to my local host server. I also had to set up an https server to listen on port 8443
+
+`https://twitchio.dev/en/stable/exts/eventsub.html#twitchio.ext.eventsub.ChannelCheerData`
