@@ -10,6 +10,9 @@ import asyncio
 
 load_dotenv()
 
+CLIENT_ID = os.getenv("EVENTSUB_CLIENT_ID")
+CLIENT_SECRET = os.getenv("EVENTSUB_CLIENT_SECRET")
+
 def parse_message(msg):
     obj = json.loads(msg)
     metadata = obj["metadata"]
@@ -43,13 +46,14 @@ class Auth(object):
         return datetime.now() > self.valid_until
     
     def get_bearer_token(self):
+        print(auth.token)
         return "Bearer " + auth.token
 
 
 def get_auth():
     res = requests.post("https://id.twitch.tv/oauth2/token", data= {
-        "client_id": os.getenv("CLIENT_ID"),
-        "client_secret": os.getenv("CLIENT_SECRET"),
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
         "grant_type": "client_credentials"
     })
 

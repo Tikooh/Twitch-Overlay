@@ -7,17 +7,22 @@ import os
 
 load_dotenv()
 
-def enable_all_subscriptions(auth, session_id):
+CLIENT_ID = os.getenv("EVENTSUB_CLIENT_ID")
+print(CLIENT_ID)
+CLIENT_SECRET = os.getenv("EVENTSUB_CLIENT_SECRET")
+
+def enable_all_subscriptions(auth, session_id, version):
+    print(f"Subscribing to event channel.follow")
     enable_subscription(auth, session_id, "channel.follow", {
-        "broadcaster_user_id": 213205254,
-        "moderator_user_id": 213205254,
-    })
+        "broadcaster_user_id": "213205254",
+        "moderator_user_id": "213205254",
+    }, version=version)
 
 
-def enable_subscription(sessionID, auth, sub_type, condition):
-    res = requests.post(data={
+def enable_subscription(sessionID, auth, sub_type, condition, version):
+    res = requests.post("https://api.twitch.tv/helix/eventsub/subscriptions", json={
         "type": sub_type,
-        "version": 1,
+        "version": version,
         "condition": condition,
         "transport": {
             "method": "websocket",
@@ -25,11 +30,15 @@ def enable_subscription(sessionID, auth, sub_type, condition):
         }
     }, headers= {
         "Authorization": auth.get_bearer_token(),
-        "Client-Id": os.getenv('CLIENT_ID'),
+        "Client-Id": CLIENT_ID,
         "Content-Type": "application/json",
     })
 
     if res.status_code != 200:
+        print(auth.get_bearer_token())
+        print(res.json())
+        print(sessionID)
+        print(os.getenv("CLIEENT_ID"))
         raise Exception("Failed to request subscription")
     
 async def init(auth):
@@ -40,6 +49,6 @@ async def init(auth):
             raise Exception("first message must be welcome")
         print("handshake successful")
         sessionID = msg.payload.session.id
-        enable_all_subscriptions(sessionID, auth)
+        enable_all_subscriptions(sessionID, auth, 2)
         await ws.close()
 
