@@ -10,21 +10,27 @@ import asyncio
 from dotenv import load_dotenv
 import os
 import ssl
-from aiohttp import web
+import json
+from chatbot import send_to_clients
+
+import logging
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 load_dotenv()
-
-ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-ssl_context.load_cert_chain(certfile='/home/george/keys/fullchain.pem', keyfile='/home/george/keys/privkey.pem')
+clients = set()
 
 APP_ID = os.getenv("EVENTSUB_CLIENT_ID")
 APP_SECRET = os.getenv("EVENTSUB_CLIENT_SECRET")
+AUTH_TOKEN = os.getenv("AUTH_TOKEN")
 TARGET_SCOPES = [AuthScope.MODERATOR_READ_FOLLOWERS]
 
 
 async def on_follow(data: ChannelFollowEvent):
     # our event happened, lets do things with the data we got!
     print(f'{data.event.user_name} now follows {data.event.broadcaster_user_name}!')
+    await send_to_clients('follow', data)
 
 
 async def run():
@@ -55,7 +61,6 @@ async def run():
         # stopping both eventsub as well as gracefully closing the connection to the API
         await eventsub.stop()
         await twitch.close()
-
 
 if __name__ == "__main__":
     asyncio.run(run())
