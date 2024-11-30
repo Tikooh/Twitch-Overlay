@@ -1,14 +1,152 @@
-# Twitch-Overlay
+# Fgeorge Twitch Bot
 
-## FOR GENERATING AUTH TOKEN FROM CLIENT ID AND SECRET
+`https://twitchio.dev/en/stable/exts/eventsub.html#twitchio.ext.eventsub.ChannelCheerData`
 
-In your web browser type in the following to get an authorisation code from the url
+# Authorising Eventsub 
+
+Authorising Eventsub for Twitch differs depending on if you choose to use websockets or webhooks. For webhooks, see `https://dev.twitch.tv/docs/eventsub/handling-webhook-events/` and for websockets see `https://dev.twitch.tv/docs/eventsub/handling-websocket-events/`.
+
+- Webhooks requires an app access token to authenticate
+- Websockets require a user access token to authenticate
+- Both webhooks and websockets require ssl connection and a public-facing ip
+
+
+## Setting up Domain
+
+For the public-facing ip I used my domain fgeorge.org registered on Cloudflare. Go to the DNS section and add:
+```
+A record
+name: @ (root)
+content: <your public ip> 
+Reverse proxy: disabled
+```
+A records map your domain to your hosting server's ip address.
+
+Enable `Full (Strict)` to enable end-to-end encryption and enforce validation
+
+
+## Creating SSL Certificate for Domain
+
+to create an ssl certificate for your domain you cannot self-sign because it will not be accepted by Twitch. Use openssl to generate an ssl cert.
+
+Pip install openssl `sudo apt install openssl`
+
+Run `sudo certbot certonly --manual --preferred-challenges dns -d fgeorge.org -d www.fgeorge.org` as you do not want to open your port at the moment to avoid compromising your system
+
+Add a TXT record to your domain
+```
+name: _acme_challenge
+content <provided key>
+```
+
+The priv key is stored at `/etc/letsencrypt/live/<domain>`
+
+
+## Setting up HTTPS Server
+
+When you send a post request to Twitch Eventsub server it will return a challenge, which you must respond with to complete the handshake. If successful a connection will be made. Twitch will send ping to your server which must respond with pong to maintain the connection.
+
+```
+async def handle_http(request):
+    data = await request.json()
+    try:       
+        if 'challenge' in data:
+            return web.Response(text=data['challenge'], content_type='text/plain', status=200)
+        
+        return web.Response(text='Invalid Data', status=400)
+
+    except Exception:
+        print(Exception)
+        return web.Response(text="Error", content_type='text/plain', status=500)
+```
+
+You can verify if the server is listening on the port with `sudo netstat -tuln | grep <port>`
+
+
+## Setting up Nginx for Reverse Proxy
+
+Nginx is required to act as a reverse proxy between your domain and your server host. This is used to redirect traffic from your domain to the correct port of your server.
+
+Install Nginx `sudo apt install nginx`
+
+Start Nginx with `sudo systemctl start nginx`
+
+Edit `/etc/nginx/sites-enabled/default` with
+
+```
+server {
+    listen 443 ssl; # listens on port 443 for secure connection
+    server_name fgeorge.org www.fgeorge.org;
+
+    ssl_certificate /etc/letsencrypt/live/fgeorge.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/fgeorge.org/privkey.pem;
+
+    # Proxy HTTP POST requests
+    location /eventsub/ {
+        proxy_pass http://localhost:4000;
+        proxy_set_header Host $host; # host server
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; # forwards initial client's ip address to server
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+```
+
+Restart nginx with `systemctl reload nginx`
+
+Use `sudo netstat -tuln | grep nginx` to verify ports which nginx is listening on
+
+
+## Opening your port and removing firewall restriction
+
+You are required to enable port forwarding on your router. This ensures that all traffic labelled under a specified port is forwarded to your device on x port.
+
+Open port 443 on your machine.
+
+Check firewall status with `sudo ufw status` and enable with `sudo ufw allow 443/tcp`
+
+
+## Generating OAuth Token
+
+Twitch Eventsub requires user access token to authenticate bots.
+
+### Webhooks
+You can make a post request containing your client id and secret to get a client credentials token. This is useful for webhooks
+```
+res = requests.post("https://id.twitch.tv/oauth2/token", data= {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "grant_type": "client_credentials"
+    })
+```
+
+Example in code
+
+```
+    res = requests.post("https://id.twitch.tv/oauth2/token", data= {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "grant_type": "client_credentials"
+    })
+
+    if res.status_code == 200:
+        body = res.json()
+        if body["token_type"] != "bearer":
+            raise Exception(f"Did not receive correct token type")
+        valid_until = datetime.datetime.now() + datetime.timedelta(seconds=body["expires_in"])
+        return Auth(body["access_token"], valid_until)
+```
+
+
+### Websockets
+Use in either a script or in browser to generate a code which can be exchanged for a user access token
+
 ```
 https://id.twitch.tv/oauth2/authorize?response_type=code
 &client_id=abc123def456
 &redirect_uri=http://localhost:5000
 &scope=<Desired-scope>
-  ```
+```
+
 
 Use Curl to exchange your authorisation code for an auth token
 ```
@@ -20,282 +158,48 @@ curl -X POST https://id.twitch.tv/oauth2/token \
 -d redirect_uri=<YOUR_REDIRECT_URI>
 ```
 
-Make sure to set up nginx as a reverse proxy and create a self-signed ssl.
+Exchange it for a user access token
 
-Also set up ngrox as a tunneling service to get a public facing ip
 
-```
-server {
-    listen 443 ssl;
-    server_name fgeorge.org www.fgeorge.org;
+## Testing eventsub
 
-    location /.well-known/acme-challenge/ {
-    root /var/www/certbot;  # Ensure this points to the correct directory
-    }
+You will need to add a post to your http server under `/eventsub`
 
-    ssl_certificate /etc/ssl/localhost.crt;
-    ssl_certificate_key /etc/ssl/localhost.key;
+Use `curl --tlsv1.2 -k -X POST https://127.0.0.1:8443/eventsub/ -d '{"test": "data"}' -H "Content-Type: application/json"` to test your localhost
 
-    # Enable SSL protocols
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256';
+`--tlsv1.2` flag is used to ensure that curl is using correct ssl protocol
 
-    # Redirect HTTP to HTTPS
-    location / {
-        proxy_pass https://localhost:5000;  # Your TwitchIO server
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+Next, you can use twitch event to directly test a subscription event.
 
-# Optionally, if you want to redirect all HTTP traffic to HTTPS
-server {
-    listen 80;
-    server_name fgeorge.org www.fgeorge.org;
-
-    location / {
-        return 301 https://$host$request_uri;
-    }
-}
-```
-
-I don't know what is going on but:
-
-Eventsub server -> cloudflare reverse proxy ssl -> cloudflare domain (fgeorge.org) -> nginx reverse proxy -> localhost:4000
-
-ensure the firewall does not block
-
-eventsub sends a challenge to domain to ensure it is owned by the user. If this is not properly handled the connection is terminated
+Install twitch event using `brew`
 
 ```
-use curl -I https://www.fgeorge.org/eventsub/ to check if web host is available
-````
-
-```
-twitch event verify-subscription subscribe -F https://www.fgeorge.org/eventsub/ -s <YOUR WEBHOOK SECRET> for testing eventsub
-```
-
-curl -X POST http://fgeorge.org/eventsub/ -d '{"test": "data"}' -H "Content-Type: application/json"
-error code: 522
-
-server {
-    listen 80;
-    server_name fgeorge.org www.fgeorge.org;
-
-    location /.well-known/acme-challenge/ {
-        root /var/www/certbot;
-    }
-
-    location / {
-        proxy_pass http://localhost:4000;  # Your app running locally
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-
-```
-eventsub_server = await websockets.serve(handle_websocket, "0.0.0.0", 4000)
-
- Cloudflare:
-SSL/TLS encryption
-Current encryption mode:
-
-Flexible
-
-	
-
-A
-fgeorge.org
-
-Proxied
-```
-
-EVENTSUB TAKES HTTP NOT WEBSOCKET IT DOES NOT COMMUNICATE WITH WEBSOCKETS
-
-`websocat wss://fgeorge.org/eventsub/ -t`
-
-`sudo certbot certonly --manual --preferred-challenges dns -d fgeorge.org -d www.fgeorge.org`
-
-`sudo netstat -tuln | grep 80`
-
-`sudo ufw status`
-
-`curl -X POST https://fgeorge.org/eventsub/ -d '{"test": "data"}' -H "Content-Type: application/json"`
-
-```
-server {
-    listen 443 ssl;
-    server_name fgeorge.org www.fgeorge.org;
-
-    ssl_certificate /etc/letsencrypt/live/fgeorge.org/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/fgeorge.org/privkey.pem;
-
-    # Proxy HTTP POST requests
-    location /eventsub/ {
-        proxy_pass http://localhost:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    # Proxy WebSocket connections
-    location /ws/ {
-        proxy_pass http://localhost:4000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-```
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-Make sure to enable strict mode on cloudflare and disable cloudflare reverse proxy
-
-`sudo ufw allow 8443/tcp`
-`curl -X POST https://fgeorge.org:8443/eventsub/ -d '{"test": "data"}' -H "Content-Type: application/json"`
-
-```
-curl 127.0.0.1:443
-<html>
-<head><title>400 The plain HTTP request was sent to HTTPS port</title></head>
-<body>
-<center><h1>400 Bad Request</h1></center>
-<center>The plain HTTP request was sent to HTTPS port</center>
-<hr><center>nginx/1.22.0 (Ubuntu)</center>
-</body>
-</html>
-```
-
-Enabling port forwarding on router to point external traffic on port 443 to my server on port 443
-`https://www.reddit.com/r/VirginMedia/comments/ywwfpf/hub_5_port_forwarding/`
-
-```
-curl https://fgeorge.org
-<!DOCTYPE html>
-<html>
-<head>
-<title>Welcome to nginx!</title>
-<style>
-html { color-scheme: light dark; }
-body { width: 35em; margin: 0 auto;
-font-family: Tahoma, Verdana, Arial, sans-serif; }
-</style>
-</head>
-<body>
-<h1>Welcome to nginx!</h1>
-<p>If you see this page, the nginx web server is successfully installed and
-working. Further configuration is required.</p>
-
-<p>For online documentation and support please refer to
-<a href="http://nginx.org/">nginx.org</a>.<br/>
-Commercial support is available at
-<a href="http://nginx.com/">nginx.com</a>.</p>
-
-<p><em>Thank you for using nginx.</em></p>
-</body>
-</html>
-```
-
-```
-twitch event verify-subscription subscribe -F https://fgeorge.org/eventsub/ -s 976de7c7a56fdb25bdb01403f3025b2e452a
-✗ Invalid response. Received <html>
-<head><title>502 Bad Gateway</title></head>
-<body>
-<center><h1>502 Bad Gateway</h1></center>
-<hr><center>nginx/1.22.0 (Ubuntu)</center>
-</body>
-</html>
- as body, expected 19186602-fa35-963b-9e03-3827af139cf6
-✗ Invalid content-type header. Received type text/html. Expecting text/plain.
-✗ Invalid status code. Received 502, expected a 2XX status
-```
-
-`curl --tlsv1.2 -k -X POST https://127.0.0.1:8443/eventsub/ -d '{"test": "data"}' -H "Content-Type: application/json"` and ensure http has proper ssl_context
-
-force correct protocol
-
-`sudo tail -f /var/log/nginx/error.log`
-
-```
-POST /eventsub/ HTTP/1.1", upstream: "http://127.0.0.1:4000/eventsub/", host: "fgeorge.org"
-2024/11/25 22:30:54 [error] 95239#95239: *47 upstream prematurely closed connection while reading response header from upstream, client: 94.174.171.208, server: fgeorge.org, request: "POST /eventsub/ HTTP/1.1", upstream: "http://127.0.0.1:4000/eventsub/", host: "fgeorge.org"
-```
-
-```
-rg, request: "GET /wp-admin/setup-config.php HTTP/1.1", host: "fgeorge.org"
-2024/11/25 22:50:08 [error] 102753#102753: *91 open() "/usr/share/nginx/html/wp-admin/setup-config.php" failed (2: No such file or directory), client: 94.174.171.208, server: fgeorge.org, request: "GET /wp-admin/setup-config.php HTTP/1.1", host: "fgeorge.org"
-this is someone botting me
-^C
-```
-
-```
- twitch event verify-subscription subscribe -F https://fgeorge.org/eventsub/ -s 976de7c7a56fdb25bdb01403f3025b2e452a7ef982
-✗ Invalid response. Received Errorrrrr as body, expected f7863bb9-f3c3-8211-5474-196f98fde7ff
-✔ Valid content-type header. Received type text/plain with charset utf-8
-✗ Invalid status code. Received 500, expected a 2XX status
-
-```
-
-```
-async def handle_http(request):
-    try:
-        data = await request.json()
-        print({data})
-        
-        if 'challenge' in data:
-            return web.Response(text=data['challenge'], content_type='text/plain', status=200)
-        
-        return web.Response(text='Invalid Data', status=400)
-
-    except Exception:
-        print({Exception})
-        return web.Response(text="Errorrrrr", content_type='text/plain', status=500)
-```
-
-```
-twitch event verify-subscription subscribe -F https://fgeorge.org/eventsub/ -s 976de7c7a56fdb25bdb01403f3025b2e452a7ef9825611588478bdfa8dbf4e53
-✗ Invalid response. Received 500 Internal Server Error
-```
-
-```
-async def handle_http(request):
-    data = await request.json()
-    try:       
-        print(data)
-        
-        if 'challenge' in data:
-            return web.Response(text=data['challenge'], content_type='text/plain', status=200)
-        
-        return web.Response(text='Invalid Data', status=400)
-
-    except Exception:
-        print(Exception)
-        return web.Response(text="Errorrrrr", content_type='text/plain', status=500)
-```
-```
-{'challenge': '75fd7e74-b3e9-8619-3d71-1fd2fca76986', 'subscription': {'id': '3f1ac488-4812-eb66-3435-cc405140501b', 'status': 'webhook_callback_verification_pending', 'type': 'channel.subscribe', 'version': '1', 'condition': {'broadcaster_user_id': '38726782'}, 'transport': {'method': 'webhook', 'callback': 'https://fgeorge.org/eventsub/'}, 'created_at': '2024-11-25T23:17:12.884272245Z', 'cost': 0}}
-INFO:aiohttp.access:127.0.0.1 [25/Nov/2024:23:17:12 +0000] "POST /eventsub/ HTTP/1.0" 200 189 "-" "twitch-cli/1.1.24"
-```
-```
-twitch event verify-subscription subscribe -F https://fgeorge.org/eventsub/ -s 976de7c7a56fdb25bdb01403f3025b2e452a7ef9825611588478bdfa8dbf4e53
+twitch event verify-subscription subscribe -F https://fgeorge.org/eventsub/ -s <secret>
 ✔ Valid response. Received challenge 75fd7e74-b3e9-8619-3d71-1fd2fca76986 in body
 ✔ Valid content-type header. Received type text/plain with charset utf-8
 ✔ Valid status code. Received status 200
 ```
 
-So first i generated a ssl cert with letsencrypt for fgeorge.org domain then I enabled port forwarding for 443 to my server. then I set up nginx to listne on port 443 and proxy all the request posts to my 8443 port with a secure ssl connection. Then I tested eventsub. I also had to set record A to point my domain to my local host server. I also had to set up an https server to listen on port 8443
+## Subscriptions
 
-`https://twitchio.dev/en/stable/exts/eventsub.html#twitchio.ext.eventsub.ChannelCheerData`
+https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelfollow
+
+
+Subscriptions are initially JSON so must be parsed into an object before using. This depends on your language.
+
+
+The format of a channel follow subscription is as follows:
+
+```
+{
+    "type": "channel.follow",
+    "version": "2",
+    "condition": {
+        "broadcaster_user_id": "1337",
+        "moderator_user_id": "1337"
+    },
+    "transport": {
+        "method": "webhook",
+        "secret": "s3cRe7"
+    }
+}
