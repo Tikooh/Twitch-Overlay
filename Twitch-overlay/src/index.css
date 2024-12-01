@@ -23,3 +23,26 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
 }
+
+.p__chat_message {
+  position: relative;
+  animation: fly-in-animation 0.2s ease-out forwards;
+  margin: 5px;
+
+}
+
+.div__chat_window {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(600px);
+  
+}
+@keyframes fly-in-animation {
+  from {
+    transform: translateX(-100%);
+  }
+  
+  to {
+    transform: translateX(0);
+  }
+}

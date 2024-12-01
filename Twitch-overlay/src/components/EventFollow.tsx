@@ -28,7 +28,7 @@ const EventFollow = () => {
 
     const content = (
         <>
-            <p className="p__follow">Thanks for the follow! {user}</p>
+            {/* <p className="p__follow">Thanks for the follow! {user}</p> */}
         </>
     )
     

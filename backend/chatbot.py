@@ -16,17 +16,18 @@ class ChatBot(commands.Bot):
         super().__init__(token=(f"oauth:{AUTH_TOKEN}"), prefix="!", initial_channels=["george_f0"])
 
     async def event_message(self, data):
-
         name = data.author.name
         content = data.content
+        color = data.author.color
 
         message = {
             "name": name,
             "content": content,
+            "color": color,
             "expiry": 15000
         }
         
-        print(message)
+        # print(message)
         await send_to_clients('getChat', message)
     
     async def event_ready(self):
