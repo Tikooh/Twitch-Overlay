@@ -22,7 +22,7 @@ const Chat = () => {
     const handleMessage = (event: messageType) => {
         const received_message: messageType = event
 
-        console.log(received_message)
+        // console.log(received_message)s
         if (received_message.event === 'getChat') {
 
             console.log("Message Received")

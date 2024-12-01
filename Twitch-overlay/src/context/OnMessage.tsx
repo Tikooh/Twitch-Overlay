@@ -33,6 +33,8 @@ const OnMessage = () => {
     
     ws.onmessage = (event) => {
         const received_message = JSON.parse(event.data)
+
+        listeners.forEach(listeners => console.log(listeners))
     
         listeners.forEach(listener => listener(received_message))
     }
