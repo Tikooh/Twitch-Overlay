@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react"
-import OnMessage, { messageType } from "../context/OnMessage"
+import useWebSocket from "react-use-websocket"
 
 const EventFollow = () => {
 
-    const [user, setUser] = useState('')
-    const { addListener, removeListener}  = OnMessage()
+    const { readyState, getWebSocket, lastMessage } = useWebSocket('ws://localhost:5000',
+        {share: true})
 
-    const handleMessage = (event: messageType) => {
-        const received_message: messageType = event
+    const [user, setUser] = useState('')
+
+    const handleMessage = (event: MessageEvent) => {
+        const received_message = JSON.parse(event.data)
 
         console.log(received_message)
 
@@ -18,12 +20,10 @@ const EventFollow = () => {
     }
 
     useEffect(() => {
-        addListener(handleMessage)
-
-        return () => {
-            removeListener(handleMessage)
+        if (lastMessage !== null) {
+            handleMessage(lastMessage)
         }
-    },[])
+    }, [lastMessage]);
 
 
     const content = (

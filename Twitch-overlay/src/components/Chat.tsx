@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
-import OnMessage, { messageType } from "../context/OnMessage"
+
+import useWebSocket from "react-use-websocket"
 
 export type message = {
     name: string,
@@ -17,12 +18,15 @@ type propsType = {
 const Chat = () => {
     const [messages, setMessages] = useState<message[]>([])
 
-    const {addListener, removeListener} = OnMessage()
+    const { readyState, getWebSocket, lastMessage } = useWebSocket('ws://localhost:5000',
+                                                                    {share: true}
+    )
 
-    const handleMessage = (event: messageType) => {
-        const received_message: messageType = event
+    const handleMessage = (event: MessageEvent) => {
+        const received_message = JSON.parse(event.data)
 
-        // console.log(received_message)s
+        console.log(received_message)
+
         if (received_message.event === 'getChat') {
 
             console.log("Message Received")
@@ -42,13 +46,10 @@ const Chat = () => {
     }}
 
     useEffect(() => {
-        addListener(handleMessage)
-
-        return () => {
-            removeListener(handleMessage)
+        if (lastMessage !== null) {
+            handleMessage(lastMessage)
         }
-    }, [])
-
+    }, [lastMessage])
     // MESSAGE LIMIT
     useEffect(() => {
         if (messages.length >= 10) {
