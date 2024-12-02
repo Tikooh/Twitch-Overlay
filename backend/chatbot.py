@@ -20,6 +20,10 @@ class ChatBot(commands.Bot):
         content = data.content
         color = data.author.color
 
+        if 'emotes' in data.tags:
+            emotes = data.tags['emotes']
+            print(emotes)
+
         message = {
             "name": name,
             "content": content,

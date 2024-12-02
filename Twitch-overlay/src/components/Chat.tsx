@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 
 import useWebSocket from "react-use-websocket"
+import { usePetContext } from "../context/PetContext"
 
 export type message = {
     name: string,
@@ -22,6 +23,8 @@ const Chat = () => {
     const { readyState, getWebSocket, lastMessage } = useWebSocket('ws://localhost:5000',
                                                                     {share: true}
     )
+
+    const { pet_list, set_pet_list } = usePetContext()
 
     const handleMessage = (event: MessageEvent) => {
         const received_message = JSON.parse(event.data)
