@@ -87,6 +87,7 @@ class ChatBot(commands.Bot):
         
         print(message)
         await send_to_clients('getChat', message)
+        
     
     async def event_ready(self):
         try:

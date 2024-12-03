@@ -8,7 +8,7 @@ https://id.twitch.tv/oauth2/authorize?response_type=code
 &client_id=abc123def456
 &redirect_uri=http://localhost:5000
 &scope=<Desired-scope>
-  ```
+```
 
 Use Curl to exchange your authorisation code for an auth token
 ```

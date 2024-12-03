@@ -40,7 +40,7 @@ def format_message(emote_object_list, message):
                 message = message.replace(word, f"<img src='{emoji.url}' />")
     return message
         
-
+active_users = []
 
 class ChatBot(commands.Bot):
     def __init__(self):
@@ -65,9 +65,13 @@ class ChatBot(commands.Bot):
             "color": color,
             "expiry": 15000
         }
-        print(data.tags)
+        # print(data.tags)
         # print(message)
         await send_to_clients('getChat', message)
+
+        if not (name in active_users):
+            active_users.append(name)
+            await send_to_clients('newUser', message)
     
     async def event_ready(self):
         try:
@@ -86,6 +90,7 @@ async def handle_websocket(websocket):
             pass
     finally:
         clients.remove(websocket)
+        active_users.clear()
 
 async def send_to_clients(event, data):
     if clients:

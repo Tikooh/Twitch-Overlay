@@ -1,15 +1,16 @@
 import { createContext, ReactElement, useContext, useMemo, useState } from "react"
 
 
-type Pet = {
+export type PetType = {
     color: string,
     name: string,
+    message: string,
     isActive: boolean,
 }
 
 const pet_list_context = createContext<{
-    pet_list: Pet[];
-    set_pet_list: React.Dispatch<React.SetStateAction<Pet[]>>;
+    pet_list: PetType[];
+    set_pet_list: React.Dispatch<React.SetStateAction<PetType[]>>;
 } | undefined>(undefined)
 
 type childrenType = {
@@ -28,7 +29,7 @@ export const usePetContext = () => {
 
 export const PetContextProvider = ({children}: childrenType) => {
 
-    const [pet_list, set_pet_list] = useState<Pet[]>([])
+    const [pet_list, set_pet_list] = useState<PetType[]>([])
 
 
     // avoid rerendering unless pet_list changes

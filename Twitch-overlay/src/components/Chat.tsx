@@ -23,7 +23,7 @@ const Chat = () => {
                                                                     {share: true}
     )
 
-    const { pet_list, set_pet_list } = usePetContext()
+    
     
     const handleMessage = (event: MessageEvent) => {
         const received_message = JSON.parse(event.data)
@@ -37,6 +37,7 @@ const Chat = () => {
                     ...received_message.data,
                     id: Date.now()
                 }
+                
                 console.log(msg)
     
                 setMessages(prevMessages => [...prevMessages, msg])

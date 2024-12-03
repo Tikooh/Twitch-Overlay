@@ -203,3 +203,8 @@ The format of a channel follow subscription is as follows:
         "secret": "s3cRe7"
     }
 }
+
+
+### Links
+
+https://twitchio.dev/en/stable/reference.html#twitchio.Chatter

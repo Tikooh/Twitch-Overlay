@@ -24,11 +24,11 @@ img {
   width: 25px;
   height: 25px;
   margin-right: 5px;
-  display: inline;
+  display: inline-block;
 }
 
 span {
-  width: 80px;
+  width: 85px;
 }
 
 .grid {
@@ -38,11 +38,14 @@ span {
 
 .p__chat_message {
   display: flex;
-  flex-wrap: wrap;
+
+  white-space: nowrap;
   overflow: hidden;
-  max-width: 600px;
-  border: 1px solid #ccc;
+
+  max-width: 650px;
+  height: 40px;
   align-items: center;
+
   animation: fly-in-animation 0.2s ease-out forwards;
 }
 

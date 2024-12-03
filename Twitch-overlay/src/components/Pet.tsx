@@ -8,7 +8,7 @@ const Pet = () => {
     console.log(pet_list)
     return (
         <>
-
+            
         </>
     )
 }
