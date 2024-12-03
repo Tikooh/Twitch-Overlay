@@ -1,15 +1,46 @@
 import websockets
 import json
 from twitchio.ext import commands
+import twitchio
 import os
 from dotenv import load_dotenv
 import asyncio
+import re
 
 load_dotenv()
 
 clients = set()
 
 AUTH_TOKEN = os.getenv("AUTH_TOKEN")
+
+class Emoji:
+    def __init__(self, name, id):
+        self.name = name
+        self.id = id
+        self.url = self.get_image_url()
+
+    def get_image_url(self):
+        return f"https://static-cdn.jtvnw.net/emoticons/v2/{self.id}/default/dark/3.0"
+
+def parse_emotes(emote_data, message):
+    emote_list = []
+    for emote in emote_data.split('/'):
+        emote_id, pos = emote.split(':')
+        for position in pos.split(','):
+            start, end = map(int, position.split('-'))
+            emote_name = message[start:end + 1]
+        emote_list.append(Emoji(emote_name, emote_id))
+
+    return emote_list
+
+def format_message(emote_object_list, message):
+    for word in message.split(' '):
+        for emoji in emote_object_list:
+            if emoji.name == word:
+                message = message.replace(word, f"<img src='{emoji.url}' />")
+    return message
+        
+
 
 class ChatBot(commands.Bot):
     def __init__(self):
@@ -19,10 +50,14 @@ class ChatBot(commands.Bot):
         name = data.author.name
         content = data.content
         color = data.author.color
-
-        if 'emotes' in data.tags:
+        
+        if data.tags.get('emotes', '') != '':
+            print(data.tags)
             emotes = data.tags['emotes']
-            print(emotes)
+            emote_list = parse_emotes(emotes, content)
+            content = format_message(emote_list, content)
+            print(content)
+
 
         message = {
             "name": name,
@@ -30,7 +65,7 @@ class ChatBot(commands.Bot):
             "color": color,
             "expiry": 15000
         }
-        
+        print(data.tags)
         # print(message)
         await send_to_clients('getChat', message)
     

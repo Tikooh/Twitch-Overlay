@@ -11,11 +11,10 @@ export type message = {
     id: number
 }
 
-type propsType = {
-    name: string,
+type MessageRendererProp = {
     content: string,
-    expiry: number
 }
+
 
 const Chat = () => {
     const [messages, setMessages] = useState<message[]>([])
@@ -25,7 +24,7 @@ const Chat = () => {
     )
 
     const { pet_list, set_pet_list } = usePetContext()
-
+    
     const handleMessage = (event: MessageEvent) => {
         const received_message = JSON.parse(event.data)
         console.log(received_message.data)
@@ -60,15 +59,22 @@ const Chat = () => {
         }
     }, [messages])
 
+    const MessageRenderer = ({ content }: MessageRendererProp) => {
+        return (
+            <p dangerouslySetInnerHTML={{ __html: content}}></p>
+        )
+    }
     const content = (
         <>
             <div className="div__chat_window">
                 {messages.map(message => {
                     return (
-                        <p key={message.id} className="p__chat_message">
-                            <span style={{color: message.color}}>{message.name}: </span>
-                            <span>{message.content}</span>
-                        </p>
+                        <div key={message.id} className="p__chat_message">
+                            <span style={{color: message.color}}>{message.name}:</span>
+                            <span>
+                                <MessageRenderer content={message.content}></MessageRenderer>
+                            </span>
+                        </div>
                     )
                 })}
             </div>

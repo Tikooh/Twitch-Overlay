@@ -19,21 +19,34 @@
   height: 650px;
 } */
 
+/* for emotes */
+img {
+  width: 25px;
+  height: 25px;
+  margin-right: 5px;
+  display: inline;
+}
+
+span {
+  width: 80px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
 }
 
 .p__chat_message {
-  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+  max-width: 600px;
+  border: 1px solid #ccc;
+  align-items: center;
   animation: fly-in-animation 0.2s ease-out forwards;
-  margin: 5px;
-
 }
 
 .div__chat_window {
-  display: flex;
-  flex-direction: column;
   transform: translateY(600px);
   
 }
