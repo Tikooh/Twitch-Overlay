@@ -1,6 +1,7 @@
 import useWebSocket from "react-use-websocket"
-import { usePetContext } from "../context/PetContext"
+import { PetType, usePetContext } from "../context/PetContext"
 import { useEffect } from "react"
+import { message } from "../components/Chat"
 
 const AddUser = () => {
 
@@ -9,12 +10,23 @@ const AddUser = () => {
     const { lastMessage } = useWebSocket('ws://localhost:5000',
         {share: true})
     
+    const changeMessage = (user: PetType, received_message: message) => {
+        setTimeout(() => {
+            set_pet_list((prevPetList) => prevPetList.map((user) => 
+                user.name === received_message.name
+                ? { ...user, message: ''}
+                : user))
+        }, received_message.expiry)
+
+        return { ...user, message: received_message.content}
+    }
+
     const handleMessage = (event: MessageEvent) => {
         const received_message = JSON.parse(event.data)
 
         if (received_message.event === "newUser") {
             // console.log("here")
-            console.log(received_message.data.name)
+            // console.log(received_message.data.name)
             set_pet_list((prevPetList) => [
             ...prevPetList, { color: received_message.data.color,
                                 name: received_message.data.name,
@@ -24,16 +36,13 @@ const AddUser = () => {
         }   
 
         if (received_message.event === "getChat") {
-            pet_list.forEach((user, index) => {
-                if (user.name === received_message.data.name) {
-                    pet_list[index] = { ...pet_list[index], message: received_message.data.message}
-                    setTimeout(() => {
-                        pet_list[index] = { ...pet_list[index], message: ''}
-                    }, received_message.data.expiry)
-                }
-            })
+            // console.log(received_message.data)
+            set_pet_list((prevPetList) => prevPetList.map((user) => 
+                                                        user.name === received_message.data.name
+                                                        ? changeMessage(user, received_message.data)
+                                                        : user))
+            }
         }
-    }
 
     useEffect(() => {
         if (lastMessage !== null) {
@@ -42,7 +51,7 @@ const AddUser = () => {
     }, [lastMessage])
     
 
-    return 0
+    return 
 }
 
 export default AddUser

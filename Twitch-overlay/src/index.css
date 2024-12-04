@@ -28,7 +28,7 @@ img {
 }
 
 span {
-  width: 85px;
+  /* width: 85px; */
 }
 
 .grid {
@@ -52,6 +52,27 @@ span {
 .div__chat_window {
   transform: translateY(600px);
   
+}
+
+.user {
+  display: flex;
+  flex-direction: column;
+  max-width: 80px;
+  align-items: center;
+}
+
+.username {
+  font-size: 12px;
+}
+
+.person {
+  width: 60px;
+  height: auto;
+  margin-top: -30px;
+}
+
+.user_message {
+  font-size: 12px;
 }
 @keyframes fly-in-animation {
   from {

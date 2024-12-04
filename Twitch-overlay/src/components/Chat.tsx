@@ -27,7 +27,7 @@ const Chat = () => {
     
     const handleMessage = (event: MessageEvent) => {
         const received_message = JSON.parse(event.data)
-        console.log(received_message.data)
+        // console.log(received_message.data)
         if (received_message.event === 'getChat') {
 
             console.log("Message Received")

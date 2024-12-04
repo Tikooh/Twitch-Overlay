@@ -11,10 +11,10 @@ const EventFollow = () => {
     const handleMessage = (event: MessageEvent) => {
         const received_message = JSON.parse(event.data)
 
-        console.log(received_message)
+        // console.log(received_message)
 
         if (received_message.event === 'follow') {
-            console.log(user)
+            // console.log(user)
             setUser(received_message.data.name)
         }
     }

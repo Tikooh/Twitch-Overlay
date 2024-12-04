@@ -10,8 +10,8 @@ function App() {
     <div className="grid">
       <Chat></Chat>
       <EventFollow></EventFollow>
-      <Pet></Pet>
       <AddUser></AddUser>
+      <Pet></Pet>
     </div>
     </>
   )
