@@ -27,10 +27,6 @@ img {
   display: inline-block;
 }
 
-span {
-  /* width: 85px; */
-}
-
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;

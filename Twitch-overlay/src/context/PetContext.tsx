@@ -5,6 +5,7 @@ export type PetType = {
     color: string,
     name: string,
     message: string,
+    position: number
     isActive: boolean,
 }
 

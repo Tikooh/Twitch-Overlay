@@ -31,6 +31,7 @@ const AddUser = () => {
             ...prevPetList, { color: received_message.data.color,
                                 name: received_message.data.name,
                                 message: '',
+                                position: 0,
                                 isActive: true}])
 
         }   
