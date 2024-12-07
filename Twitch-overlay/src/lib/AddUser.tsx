@@ -32,7 +32,8 @@ const AddUser = () => {
                                 name: received_message.data.name,
                                 message: '',
                                 position: 0,
-                                isWalking: true}])
+                                WALKING_EVENT: true,
+                                isWalking: false}])
 
         }   
 

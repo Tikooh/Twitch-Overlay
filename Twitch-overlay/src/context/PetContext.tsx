@@ -6,6 +6,7 @@ export type PetType = {
     name: string,
     message: string,
     position: number
+    WALKING_EVENT: boolean,
     isWalking: boolean,
 }
 
