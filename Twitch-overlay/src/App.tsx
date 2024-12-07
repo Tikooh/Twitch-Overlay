@@ -2,6 +2,7 @@ import Chat from "./components/Chat"
 import EventFollow from "./components/EventFollow"
 import Pet from "./components/Pet"
 import AddUser from "./lib/AddUser"
+import UserLogic from "./lib/UserLogic"
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
       <EventFollow></EventFollow>
       <AddUser></AddUser>
       <Pet></Pet>
+      <UserLogic></UserLogic>
     </div>
     </>
   )

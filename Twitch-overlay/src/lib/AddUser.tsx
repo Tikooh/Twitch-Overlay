@@ -32,7 +32,7 @@ const AddUser = () => {
                                 name: received_message.data.name,
                                 message: '',
                                 position: 0,
-                                isActive: true}])
+                                isWalking: true}])
 
         }   
 

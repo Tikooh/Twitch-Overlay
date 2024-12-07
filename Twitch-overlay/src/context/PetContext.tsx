@@ -6,7 +6,7 @@ export type PetType = {
     name: string,
     message: string,
     position: number
-    isActive: boolean,
+    isWalking: boolean,
 }
 
 const pet_list_context = createContext<{
