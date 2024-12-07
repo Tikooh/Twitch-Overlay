@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { PetType, usePetContext } from "../context/PetContext"
 import artistGif from '/home/george/Twitch-Overlay/Twitch-overlay/src/images/people/Artist/Artist-idle.gif'
 import artistWalking from '/home/george/Twitch-Overlay/Twitch-overlay/src/images/people/Artist/Artist-walk.gif'
+import { MessageRenderer } from "./Chat"
 
 const Pet = () => {
 
@@ -18,7 +19,7 @@ const Pet = () => {
                         }}>
                         <p className="username">{user.name}</p>
                         <img src={user.isWalking? artistWalking : artistGif} alt="" className="person" />
-                        <p className="user_message">{user.message}</p>
+                        <p className="user_message">{<MessageRenderer content={user.message}></MessageRenderer>}</p>
                     </div>
                 )
             })}

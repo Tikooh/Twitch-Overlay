@@ -15,6 +15,11 @@ type MessageRendererProp = {
     content: string,
 }
 
+export const MessageRenderer = ({ content }: MessageRendererProp) => {
+    return (
+        <p dangerouslySetInnerHTML={{ __html: content}}></p>
+    )
+}
 
 const Chat = () => {
     const [messages, setMessages] = useState<message[]>([])
@@ -23,7 +28,7 @@ const Chat = () => {
                                                                     {share: true}
     )
 
-    
+
     
     const handleMessage = (event: MessageEvent) => {
         const received_message = JSON.parse(event.data)
@@ -60,11 +65,6 @@ const Chat = () => {
         }
     }, [messages])
 
-    const MessageRenderer = ({ content }: MessageRendererProp) => {
-        return (
-            <p dangerouslySetInnerHTML={{ __html: content}}></p>
-        )
-    }
     const content = (
         <>
             <div className="div__chat_window">

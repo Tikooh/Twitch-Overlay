@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { PetType, usePetContext } from "../context/PetContext"
 
 const MAX_WALK_SPEED = 100
-const POLL_INTERVAL = 4000
+const POLL_INTERVAL = 15000
 const LEFT_MAX = 300
 const RIGHT_MAX = -300
 
