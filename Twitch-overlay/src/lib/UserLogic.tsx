@@ -18,7 +18,7 @@ const ChangePosition = (position: number) => {
         new_pos + 200
     }
 
-    return position + (Math.random() * MAX_WALK_SPEED * direction)
+    return new_pos
 }
 
 const UserLogic = () => {
