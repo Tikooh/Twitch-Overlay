@@ -1,11 +1,9 @@
 import websockets
 import json
 from twitchio.ext import commands
-import twitchio
 import os
 from dotenv import load_dotenv
 import asyncio
-import re
 
 load_dotenv()
 
@@ -103,7 +101,7 @@ async def send_to_clients(event, data):
         
 async def main():
     chatbot = ChatBot()
-    server = await websockets.serve(handle_websocket, "localhost", 5000)
+    server = await websockets.serve(handle_websocket, "0.0.0.0", 5000)
     await asyncio.gather(server.wait_closed(), chatbot.start()) 
 
 if __name__ == "__main__":

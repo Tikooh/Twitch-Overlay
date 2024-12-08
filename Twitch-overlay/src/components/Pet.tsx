@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { PetType, usePetContext } from "../context/PetContext"
-import artistGif from '/home/george/Twitch-Overlay/Twitch-overlay/src/images/people/Artist/Artist-idle.gif'
-import artistWalking from '/home/george/Twitch-Overlay/Twitch-overlay/src/images/people/Artist/Artist-walk.gif'
+import artistGif from '../images/people/Artist/Artist-idle.gif'
+import artistWalking from '../images/people/Artist/Artist-walk.gif'
 import { MessageRenderer } from "./Chat"
 
 const Pet = () => {

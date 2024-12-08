@@ -208,3 +208,52 @@ The format of a channel follow subscription is as follows:
 ### Links
 
 https://twitchio.dev/en/stable/reference.html#twitchio.Chatter
+
+## Using Docker
+
+In order to run this app on Windows partition of my device I am using docker.
+
+Use baseimage `node:18-alpine` for react frontend and `python:3.12` for the backend
+
+For the frontend ensure that you set the `WORKDIR` to `/app` and that you have exposed port 5173.
+
+You want to use:
+
+```
+docker image build Twitch-react .
+
+docker images
+
+docker ps -a 
+
+docker run -p 5173:5173 Twitch-react
+```
+
+maps container port 5173 to local host 5173 
+
+```
+npm run build
+
+npm install -g serve
+```
+
+To access a docker shell use `docker exec -it <container_name_or_id> sh`
+
+For docker compose the file structure is as follows:
+
+```
+version: 3
+
+services:
+    frontend:
+        context: ./...
+    port:
+        ...
+    depends-on:
+        backend
+    
+    backend:
+        port:
+```
+
+and is run using docker compose up --build
