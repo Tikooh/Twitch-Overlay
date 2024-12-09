@@ -12,7 +12,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: 560px 830px 450px;
+  grid-template-columns: 560px 830px 480px;
   grid-template-rows: 90px 340px 340px 175px;
   gap: 10px;
   width: 1800px;
@@ -88,6 +88,20 @@ img {
   grid-column: span 2 /4;
 }
 
+.follow_image {
+  width: 200px;
+  height: auto;
+}
+
+.follow_box {
+  grid-column: 3;
+  grid-row: 2;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
 @keyframes fly-in-animation {
   from {
     transform: translateX(-100%);
@@ -95,6 +109,16 @@ img {
   
   to {
     transform: translateX(0);
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
   }
 }
 

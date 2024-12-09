@@ -1,22 +1,37 @@
 import { useEffect, useState } from "react"
 import useWebSocket from "react-use-websocket"
+import Engineer from '../images/engineer/engine-engineer.gif'
 
 const EventFollow = () => {
 
     const { readyState, getWebSocket, lastMessage } = useWebSocket('ws://localhost:5000',
         {share: true})
 
-    const [user, setUser] = useState('')
+    const [follow_content, set_follow_content] = useState<JSX.Element | null>(null)
 
     const handleMessage = (event: MessageEvent) => {
         const received_message = JSON.parse(event.data)
 
         // console.log(received_message)
 
-        if (received_message.event === 'getChat') {
-            // console.log(user)
-            setUser(received_message.data.name)
+        if (received_message.event === 'follow') {
+            const content = (
+                <>
+                    <div className="follow_box">
+                        <img src={Engineer} alt="" className="follow_image" />
+                        <h2 className="follow_message">{received_message.name} has followed!</h2>
+                    </div>
+                </>
+            )
+
+            setTimeout(() => {
+                set_follow_content(null)
+            }, 5000)
+
+            set_follow_content(content)
         }
+        
+        
     }
 
     useEffect(() => {
@@ -24,15 +39,8 @@ const EventFollow = () => {
             handleMessage(lastMessage)
         }
     }, [lastMessage]);
-
-
-    const content = (
-        <>
-            {/* <p className="p__follow">Thanks for the follow! {user}</p> */}
-        </>
-    )
     
-    return content
+    return follow_content
 }
 
 export default EventFollow
