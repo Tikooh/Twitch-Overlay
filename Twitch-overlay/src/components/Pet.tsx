@@ -10,19 +10,21 @@ const Pet = () => {
 
     return (
         <>
+        <div className="Spawn_box">
             {pet_list.map((user) => {
-                return (
-                    <div key={user.name} className="user"
-
-                        style = {{
-                            transform: `translateX(${user.position}px)`,
-                        }}>
-                        <p className="username">{user.name}</p>
-                        <img src={user.isWalking? artistWalking : artistGif} alt="" className="person" />
-                        <p className="user_message">{<MessageRenderer content={user.message}></MessageRenderer>}</p>
-                    </div>
-                )
-            })}
+                    return (
+                        <div key={user.name} className="user"
+    
+                            style = {{
+                                transform: `translateX(${user.position}px)`,
+                            }}>
+                            <p className="username">{user.name}</p>
+                            <img src={user.isWalking? artistWalking : artistGif} alt="" className="person" />
+                            <p className="user_message">{<MessageRenderer content={user.message}></MessageRenderer>}</p>
+                        </div>
+                    )
+                })}
+        </div>
         </>
     )
 }   

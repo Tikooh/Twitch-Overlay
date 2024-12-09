@@ -12,12 +12,11 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-/* 
+
 .div__chat_window {
-  background-image: url('/home/george/Twitch-Overlay/Twitch-overlay/src/images/Chat Window-export.png');
-  width: 525px;
-  height: 650px;
-} */
+  grid-row: 4;
+  grid-column: 1;
+}
 
 /* for emotes */
 img {
@@ -29,7 +28,9 @@ img {
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 2fr 5fr 2fr;
+  grid-template-rows: 3fr 4fr 10fr 4fr;
+  gap: 10px;
 }
 
 .p__chat_message {
@@ -73,6 +74,11 @@ img {
   font-size: 12px;
 }
 
+.Spawn_box {
+  display: flex;
+  grid-row: 4;
+  grid-column: span 2 /4;
+}
 @keyframes fly-in-animation {
   from {
     transform: translateX(-100%);
