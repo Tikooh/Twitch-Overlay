@@ -1,16 +1,13 @@
 :root {
   font-family: 'Fira Code', sans-serif;
-  line-height: 1.5;
+  line-height: 1;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: white;
   background-color: rgba(0,0,0,255);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 .grid {
@@ -73,7 +70,15 @@ img {
 .user_message {
   font-size: 12px;
   white-space: nowrap;
-  align-items: end;
+  position: absolute;
+
+  left: 50px;
+  bottom: 110px;
+  max-width: 60px;
+  z-index: -1;
+
+  overflow: hidden;
+
   display: flex;
 }
 

@@ -13,7 +13,7 @@ const EventFollow = () => {
 
         // console.log(received_message)
 
-        if (received_message.event === 'follow') {
+        if (received_message.event === 'getChat') {
             // console.log(user)
             setUser(received_message.data.name)
         }

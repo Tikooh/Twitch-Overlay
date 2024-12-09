@@ -6,9 +6,10 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY chatbot.py .
-COPY eventsub.py .
+COPY main.py .
 COPY .env .
 
 EXPOSE 5000
+EXPOSE 17563
 
 CMD ["python3", "chatbot.py"]

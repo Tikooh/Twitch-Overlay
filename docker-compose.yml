@@ -16,3 +16,4 @@ services:
       dockerfile: dockerfile
     ports:
       - "5000:5000"
+      - "17563:17563"
