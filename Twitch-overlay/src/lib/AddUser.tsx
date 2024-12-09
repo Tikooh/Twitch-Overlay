@@ -31,7 +31,7 @@ const AddUser = () => {
             ...prevPetList, { color: received_message.data.color,
                                 name: received_message.data.name,
                                 message: '',
-                                position: 0,
+                                position: (Math.random() * 600),
                                 WALKING_EVENT: true,
                                 isWalking: false}])
 

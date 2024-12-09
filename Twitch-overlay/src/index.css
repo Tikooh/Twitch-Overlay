@@ -1,11 +1,11 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Fira Code', sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
   color: white;
-  background-color: #242424;
+  background-color: rgba(0,0,0,255);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,24 +13,29 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.div__chat_window {
-  grid-row: 4;
-  grid-column: 1;
+.grid {
+  display: grid;
+  grid-template-columns: 560px 830px 450px;
+  grid-template-rows: 90px 340px 340px 175px;
+  gap: 10px;
+  width: 1800px;
+  height: 950px;
+  overflow: hidden;
 }
 
+.div__chat_window {
+  grid-row: 3;
+  grid-column: 1;
+  display: flexbox;
+  margin: 10px;
+  vertical-align: bottom;
+}
 /* for emotes */
 img {
   width: 25px;
   height: 25px;
   margin-right: 5px;
   display: inline-block;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 2fr 5fr 2fr;
-  grid-template-rows: 3fr 4fr 10fr 4fr;
-  gap: 10px;
 }
 
 .p__chat_message {
@@ -44,11 +49,6 @@ img {
   align-items: center;
 
   animation: fly-in-animation 0.2s ease-out forwards;
-}
-
-.div__chat_window {
-  transform: translateY(600px);
-  
 }
 
 .user {
@@ -72,6 +72,9 @@ img {
 
 .user_message {
   font-size: 12px;
+  white-space: nowrap;
+  align-items: end;
+  display: flex;
 }
 
 .Spawn_box {
@@ -79,6 +82,7 @@ img {
   grid-row: 4;
   grid-column: span 2 /4;
 }
+
 @keyframes fly-in-animation {
   from {
     transform: translateX(-100%);
@@ -87,4 +91,9 @@ img {
   to {
     transform: translateX(0);
   }
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  src: url('./fonts/static/FiraCode-SemiBold.ttf') format('truetype');
 }
