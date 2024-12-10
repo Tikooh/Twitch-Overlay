@@ -30,7 +30,7 @@ TARGET_SCOPES = [AuthScope.MODERATOR_READ_FOLLOWERS]
 async def on_follow(data: ChannelFollowEvent):
     # our event happened, lets do things with the data we got!
     print(f'{data.event.user_name} now follows {data.event.broadcaster_user_name}!')
-    await send_to_clients('follow', data)
+    await send_to_clients('follow', data.event)
 
 
 async def run():

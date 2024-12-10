@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import useWebSocket from "react-use-websocket"
 import Engineer from '../images/engineer/engine-engineer.gif'
+import { playSound } from "../lib/SoundEffect"
 
 const EventFollow = () => {
 
@@ -15,11 +16,12 @@ const EventFollow = () => {
         // console.log(received_message)
 
         if (received_message.event === 'follow') {
+            playSound()
             const content = (
                 <>
                     <div className="follow_box">
                         <img src={Engineer} alt="" className="follow_image" />
-                        <h2 className="follow_message">{received_message.name} has followed!</h2>
+                        <h2 className="follow_message">{received_message.data.name} has followed!</h2>
                     </div>
                 </>
             )
