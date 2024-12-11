@@ -78,7 +78,6 @@ class ChatBot(commands.Bot):
         except Exception as e:
             print(f'Error in event_ready: {e}', flush=True)
 
-
 async def handle_websocket(websocket):
 
     clients.add(websocket)

@@ -21,7 +21,7 @@ const EventFollow = () => {
                 <>
                     <div className="follow_box">
                         <img src={Engineer} alt="" className="follow_image" />
-                        <h2 className="follow_message">{received_message.data.name} has followed!</h2>
+                        <h2 className="follow_message">{received_message.data.user_name} has followed!</h2>
                     </div>
                 </>
             )

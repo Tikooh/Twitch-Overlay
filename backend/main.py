@@ -9,8 +9,6 @@ from twitchAPI.type import AuthScope
 import asyncio
 from dotenv import load_dotenv
 import os
-import ssl
-import json
 from chatbot import send_to_clients
 
 import logging

@@ -60,7 +60,7 @@ const Chat = () => {
     }, [lastMessage])
     // MESSAGE LIMIT
     useEffect(() => {
-        if (messages.length >= 4) {
+        if (messages.length >= 6) {
             setMessages(prevMessages => prevMessages.slice(1))
         }
     }, [messages])

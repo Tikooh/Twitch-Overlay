@@ -1,5 +1,5 @@
 :root {
-  font-family: 'Fira Code', sans-serif;
+  font-family: 'Outfit-bold', sans-serif;
   line-height: 1;
   font-weight: 400;
 
@@ -37,14 +37,14 @@ img {
 
 .p__chat_message {
   display: flex;
+  font-size: 18px;
 
   white-space: nowrap;
   overflow: hidden;
 
-  max-width: 650px;
+  max-width: 600px;
   height: 40px;
   align-items: center;
-
   animation: fly-in-animation 0.2s ease-out forwards;
 }
 
@@ -58,22 +58,22 @@ img {
 }
 
 .username {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .person {
-  width: 60px;
+  width: 80px;
   height: auto;
   margin-top: -30px;
 }
 
 .user_message {
-  font-size: 12px;
+  font-size: 14px;
   white-space: nowrap;
   position: absolute;
 
   left: 50px;
-  bottom: 110px;
+  bottom: 95px;
   max-width: 60px;
   z-index: -1;
 
@@ -123,6 +123,6 @@ img {
 }
 
 @font-face {
-  font-family: 'Fira Code';
-  src: url('./fonts/static/FiraCode-SemiBold.ttf') format('truetype');
+  font-family: 'Outfit-bold';
+  src: url('./fonts/Outfit/static/Outfit-Bold.ttf') format('truetype');
 }
