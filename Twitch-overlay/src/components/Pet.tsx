@@ -2,6 +2,8 @@ import { useEffect } from "react"
 import { PetType, usePetContext } from "../context/PetContext"
 import artistGif from '../images/people/Artist/Artist-idle.gif'
 import artistWalking from '../images/people/Artist/Artist-walk.gif'
+import noble_woman_Gif from '../images/people/Noble-Woman/Noble-woman-idle.gif'
+import noble_woman_walking from '../images/people/Noble-Woman/Noble-woman-walk.gif'
 import { MessageRenderer } from "./Chat"
 
 const Pet = () => {

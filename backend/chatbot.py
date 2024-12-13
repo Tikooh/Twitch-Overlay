@@ -4,6 +4,7 @@ from twitchio.ext import commands
 import os
 from dotenv import load_dotenv
 import asyncio
+import argparse
 
 load_dotenv()
 
@@ -78,6 +79,21 @@ class ChatBot(commands.Bot):
         except Exception as e:
             print(f'Error in event_ready: {e}', flush=True)
 
+@ChatBot.command(name="sprite")
+async def change_sprite(self, ctx: commands.Context, *args):
+    print("warrior")
+    parser = argparse.ArgumentParser(description="Change sprite")
+    parser.add_argument('--type', type=str)
+
+    try:
+        parsed_args = parser.parse_args(args)
+
+        if parsed_args.type:
+            print("here")
+            await send_to_clients()
+    except argparse.ArgumentError:
+        raise NameError
+    
 async def handle_websocket(websocket):
 
     clients.add(websocket)
