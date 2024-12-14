@@ -1,9 +1,7 @@
 
 import websockets
-from websockets.asyncio.server import serve
 import json
 import asyncio
-from server import send_to_clients, addActiveClients
 from twitchio.ext import commands
 import os
 from dotenv import load_dotenv
