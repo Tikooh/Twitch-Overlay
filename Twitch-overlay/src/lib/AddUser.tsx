@@ -26,11 +26,12 @@ const AddUser = () => {
 
         if (received_message.event === "newUser") {
             // console.log("here")
-            // console.log(received_message.data.name)
+            console.log(received_message.data.name)
             set_pet_list((prevPetList) => [
             ...prevPetList, { color: received_message.data.color,
                                 name: received_message.data.name,
                                 message: '',
+                                sprite: '',
                                 position: (Math.random() * 600),
                                 WALKING_EVENT: true,
                                 isWalking: false}])
@@ -44,7 +45,16 @@ const AddUser = () => {
                                                         ? changeMessage(user, received_message.data)
                                                         : user))
             }
+        
+        if (received_message.event === "changeSprite") {
+            set_pet_list((prevPetList) => prevPetList.map((user) =>
+                                                        user.name === received_message.data[0]
+                                                        ? { ...user, sprite: received_message.data[1]}
+                                                        : user))
+            }
         }
+
+
 
     useEffect(() => {
         if (lastMessage !== null) {

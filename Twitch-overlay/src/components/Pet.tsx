@@ -1,14 +1,10 @@
-import { useEffect } from "react"
 import { PetType, usePetContext } from "../context/PetContext"
-import artistGif from '../images/people/Artist/Artist-idle.gif'
-import artistWalking from '../images/people/Artist/Artist-walk.gif'
-import noble_woman_Gif from '../images/people/Noble-Woman/Noble-woman-idle.gif'
-import noble_woman_walking from '../images/people/Noble-Woman/Noble-woman-walk.gif'
 import { MessageRenderer } from "./Chat"
+import { spriteMap } from "../lib/Sprites"
 
 const Pet = () => {
 
-    const {pet_list, set_pet_list } = usePetContext()
+    const { pet_list, set_pet_list } = usePetContext()
 
     return (
         <>
@@ -21,7 +17,7 @@ const Pet = () => {
                                 transform: `translateX(${user.position}px)`,
                             }}>
                             <p className="username">{user.name}</p>
-                            <img src={user.isWalking? artistWalking : artistGif} alt="" className="person" />
+                            <img src={user.isWalking? spriteMap[user.sprite].idle : spriteMap[user.sprite].idle} alt="" className="person" />
                             <p className="user_message">{<MessageRenderer content={user.message}></MessageRenderer>}</p>
                         </div>
                     )

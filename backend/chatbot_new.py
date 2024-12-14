@@ -71,8 +71,7 @@ async def event_message(data):
     await send_to_clients('getChat', message)
 
     if not (name in active_users):
-        active_users.append(name)
-        await addActiveClients(name)
+        await addActiveClients(name, message)
 
 @bot.event()
 async def event_ready():
@@ -87,16 +86,18 @@ async def event_ready():
 async def change_sprite(ctx: commands.Context, args: str):
     print("here")
     if args == "male":
-        await send_to_clients('changeSprite', (ctx.author.name, 'type_male'))
+        await send_to_clients('changeSprite', (ctx.author.name, 'artist'))
 
     elif args == "female":
-        await send_to_clients('changeSprite', (ctx.author.name, 'type_female'))
+        await send_to_clients('changeSprite', (ctx.author.name, 'noble_woman'))
+    
+    else:
+        print("Please input correct type ARGS")
 
 
 async def handle_websocket(websocket):
 
     clients.add(websocket)
-    print("clients")
 
     try:
         async for message in websocket:
@@ -105,14 +106,13 @@ async def handle_websocket(websocket):
         clients.remove(websocket)
         active_users.clear()
 
-async def addActiveClients(new_client):
+async def addActiveClients(new_client, message):
     active_users.append(new_client)
-    await send_to_clients('newUser', '')
+    await send_to_clients('newUser', message)
 
 
 async def send_to_clients(event, data):
     if clients:
-        print(clients)
         message = {
             'event': event,  # Include event name
             'data': data     # Include data associated with the event
