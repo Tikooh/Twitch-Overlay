@@ -9,6 +9,7 @@ active_users = []
 async def handle_websocket(websocket):
 
     clients.add(websocket)
+    print("clients")
 
     try:
         async for message in websocket:
@@ -16,6 +17,11 @@ async def handle_websocket(websocket):
     finally:
         clients.remove(websocket)
         active_users.clear()
+
+async def addActiveClients(new_client):
+    active_users.append(new_client)
+    await send_to_clients('newUser', '')
+
 
 async def send_to_clients(event, data):
     if clients:
@@ -27,9 +33,10 @@ async def send_to_clients(event, data):
         await asyncio.gather(*[client.send(json.dumps(message)) for client in clients]) #star is important dont forget the star
 
 async def main():
-    async with serve(handle_websocket, "0.0.0.0", 5000) as server:
-        await server.serve_forever()
+    server = await websockets.serve(handle_websocket, "0.0.0.0", 5000)
+    await asyncio.gather(server.wait_closed())
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
     

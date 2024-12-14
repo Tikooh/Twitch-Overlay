@@ -1,5 +1,9 @@
 
-from './websocket.py' import await
+import websockets
+from websockets.asyncio.server import serve
+import json
+import asyncio
+from server import send_to_clients, addActiveClients
 from twitchio.ext import commands
 import os
 from dotenv import load_dotenv
@@ -8,6 +12,7 @@ import asyncio
 load_dotenv()
 
 clients = set()
+active_users = []
 
 AUTH_TOKEN = os.getenv("AUTH_TOKEN")
 
@@ -37,8 +42,6 @@ def format_message(emote_object_list, message):
             if emoji.name == word:
                 message = message.replace(word, f"<img src='{emoji.url}' />")
     return message
-        
-active_users = []
 
 bot = commands.Bot(token=(f"oauth:{AUTH_TOKEN}"), prefix="!", initial_channels=["george_f0"])
 
@@ -47,6 +50,7 @@ async def event_message(data):
     name = data.author.name
     content = data.content
     color = data.author.color
+    print(name)
     
     if data.tags.get('emotes', '') != '':
         print(data.tags)
@@ -68,8 +72,7 @@ async def event_message(data):
 
     if not (name in active_users):
         active_users.append(name)
-        await send_to_clients('newUser', message)
-
+        await addActiveClients(name)
 
 @bot.event()
 async def event_ready():
@@ -88,7 +91,39 @@ async def change_sprite(ctx: commands.Context, args: str):
 
     elif args == "female":
         await send_to_clients('changeSprite', (ctx.author.name, 'type_female'))
-    
-if __name__ == '__main__':
-    bot.run()
+
+
+async def handle_websocket(websocket):
+
+    clients.add(websocket)
+    print("clients")
+
+    try:
+        async for message in websocket:
+            pass
+    finally:
+        clients.remove(websocket)
+        active_users.clear()
+
+async def addActiveClients(new_client):
+    active_users.append(new_client)
+    await send_to_clients('newUser', '')
+
+
+async def send_to_clients(event, data):
+    if clients:
+        print(clients)
+        message = {
+            'event': event,  # Include event name
+            'data': data     # Include data associated with the event
+        }
+        await asyncio.gather(*[client.send(json.dumps(message)) for client in clients]) #star is important dont forget the star
+
+async def main():
+    server = await websockets.serve(handle_websocket, "0.0.0.0", 5000)
+    await asyncio.gather(server.wait_closed(), bot.start())
+
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
 
