@@ -17,5 +17,5 @@ export type SpriteType = 'artist' | 'noble_woman'
 
 export const spriteMap: Record<SpriteType, { idle: string; walk: string }> = {
     'artist': artist,
-    'noble_woman': nobleWoman
+    'noble_woman' : nobleWoman
 }
