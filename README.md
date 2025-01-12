@@ -1,5 +1,7 @@
 # Fgeorge Twitch Bot
 
+![Example Usage](image-1.png)
+
 `https://twitchio.dev/en/stable/exts/eventsub.html#twitchio.ext.eventsub.ChannelCheerData`
 
 # Authorising Eventsub 
