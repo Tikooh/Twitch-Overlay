@@ -1,11 +1,15 @@
-FROM python:3.12
+FROM python:3.11.4
 
 WORKDIR /app
 
 COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+COPY chatbot_new.py .
+COPY main.py .
+COPY .env .
 
-COPY ..
+EXPOSE 5000
+EXPOSE 17563
 
-RUN python3 backend.py
+CMD ["python3", "chatbot_new.py"]

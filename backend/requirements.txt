@@ -1,5 +1,5 @@
-flask
-dotenv
+python-dotenv
 requests
 twitchio
-os
+twitchAPI
+websockets

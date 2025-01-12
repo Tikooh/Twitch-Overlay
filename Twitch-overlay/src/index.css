@@ -1,14 +1,129 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  font-family: 'Outfit-bold', sans-serif;
+  line-height: 1;
   font-weight: 400;
 
+  color: white;
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: transparent;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 560px 830px 480px;
+  grid-template-rows: 90px 340px 340px 175px;
+  gap: 10px;
+  width: 1800px;
+  height: 950px;
+  overflow: hidden;
+}
+
+.div__chat_window {
+  grid-row: 3;
+  grid-column: 1;
+  display: flexbox;
+  margin: 10px;
+  vertical-align: bottom;
+}
+/* for emotes */
+img {
+  width: 25px;
+  height: 25px;
+  margin-right: 5px;
+  display: inline-block;
+}
+
+.p__chat_message {
+  display: flex;
+  font-size: 18px;
+
+  white-space: nowrap;
+  overflow: hidden;
+
+  max-width: 600px;
+  height: 40px;
+  align-items: center;
+  animation: fly-in-animation 0.2s ease-out forwards;
+}
+
+.user {
+  display: flex;
+  flex-direction: column;
+  max-width: 80px;
+  align-items: center;
+  transition: transform 2s ease-in-out;
+  position: relative;
+}
+
+.username {
+  font-size: 14px;
+}
+
+.person {
+  width: 80px;
+  height: auto;
+  margin-top: -30px;
+}
+
+.user_message {
+  font-size: 14px;
+  white-space: nowrap;
+  position: absolute;
+
+  left: 50px;
+  bottom: 95px;
+  max-width: 60px;
+  z-index: -1;
+
+  overflow: hidden;
+
+  display: flex;
+}
+
+.Spawn_box {
+  display: flex;
+  grid-row: 4;
+  grid-column: span 2 /4;
+}
+
+.follow_image {
+  width: 200px;
+  height: auto;
+}
+
+.follow_box {
+  grid-column: 3;
+  grid-row: 2;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+@keyframes fly-in-animation {
+  from {
+    transform: translateX(-100%);
+  }
+  
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@font-face {
+  font-family: 'Outfit-bold';
+  src: url('./fonts/Outfit/static/Outfit-Bold.ttf') format('truetype');
 }
