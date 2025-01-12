@@ -3,6 +3,7 @@
 ![Example Usage](image-1.png)
 
 IGNORE THE COMMIT HISTORY I was not very good at organising my commits when I made this...
+Also if there are any API Tokens leaked here they have been revoked so don't try it
 
 `https://twitchio.dev/en/stable/exts/eventsub.html#twitchio.ext.eventsub.ChannelCheerData`
 
