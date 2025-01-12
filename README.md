@@ -2,6 +2,8 @@
 
 ![Example Usage](image-1.png)
 
+IGNORE THE COMMIT HISTORY I was not very good at organising my commits when I made this...
+
 `https://twitchio.dev/en/stable/exts/eventsub.html#twitchio.ext.eventsub.ChannelCheerData`
 
 # Authorising Eventsub 
